@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <!-- <meta name="viewport" cont -->
+         <title>Whack-a-grid</title>
+         <!-- <link> -->
+    </head>
+    
+    <body>
+        <!--Buttons------->
+        <button id="button_1" class="btn" onclick="check_hole()"></button>
+        <button id="button_2" class="btn" onclick="check_hole()"></button>
+        <button id="button_3" class="btn" onclick="check_hole()"></button>
+        <button id="button_4" class="btn" onclick="check_hole()"></button>
+        <button id="button_5" class="btn" onclick="check_hole()"></button>
+        <button id="button_6" class="btn" onclick="check_hole()"></button>
+        <button id="button_7" class="btn" onclick="check_hole()"></button>
+        <button id="button_8" class="btn" onclick="check_hole()"></button>
+        <button id="button_9" class="btn" onclick="check_hole()"></button>
+
+        <button id="start_round_button" class="btn" onclick="round_timer_func()">Start Round</button>
+
+        <!--Round Timer----->
+        <h1 id="round_timer_display">Timer</h1>
+        
+    </body>
+
+    <script>
+        
+        let round_time_remaining = 45_000;
+        let timer = setInterval(round_timer_func, round_time_remaining);
+        let hole_status = [0,0,0,0,0,0,0,0,0];      // Creates a nine holes, with each, initially, being empty
+
+        function calculate_time_remaining (round_time_remaining) {
+            let minutes, seconds;
+            let remaing_time_not_divided;
+            
+            // One minute = 60,000 microseconds
+            minutes = Math.floor(round_time_remaining / 60_000);                // Calculates the number of minutes, and then rounds down, so that decimal number goes into seconds
+            remaing_time_not_divided = round_time_remaining % 60_000;
+            seconds = remaing_time_not_divided / 1000;
+
+            return {minutes, seconds}                       // Returns an object wrapper, which returns the minutes and seconds
+        }
+
+        function round_timer_func () {
+            const timer_display = document.getElementById("round_timer_display");
+            let time_remaing = calculate_time_remaining(round_time_remaining);
+            let minutes = time_remaing.minutes.toString().padStart(2, '0');              // Forces minutes appear as two digits. So 1 => 01
+            let seconds = time_remaing.seconds.toString().padStart(2, '0');              // Makes seconds to appear as two digits. So 4 => 04
+            
+            timer_display.innerText = minutes + ":" + seconds;
+        }   
+        
+
+    </script>
+</html>
