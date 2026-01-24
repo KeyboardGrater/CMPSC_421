@@ -19,7 +19,7 @@
         <button id="button_8" class="btn" onclick="check_hole()"></button>
         <button id="button_9" class="btn" onclick="check_hole()"></button>
 
-        <button id="start_round_button" class="btn" onclick="round_timer_func()">Start Round</button>
+        <button id="start_round_button" class="btn" onclick="update_timer_function()">Start Round</button>
 
         <!--Round Timer----->
         <h1 id="round_timer_display">Timer</h1>
@@ -27,32 +27,50 @@
     </body>
 
     <script>
-        
-        let round_time_remaining = 45_000;
-        let timer = setInterval(round_timer_func, round_time_remaining);
-        let hole_status = [0,0,0,0,0,0,0,0,0];      // Creates a nine holes, with each, initially, being empty
+        const start_timer = 5_000;
+        let time_remaining = start_timer;
 
-        function calculate_time_remaining (round_time_remaining) {
+        
+        function calculate_time_remaining (time_remaining) {
             let minutes, seconds;
-            let remaing_time_not_divided;
-            
-            // One minute = 60,000 microseconds
-            minutes = Math.floor(round_time_remaining / 60_000);                // Calculates the number of minutes, and then rounds down, so that decimal number goes into seconds
-            remaing_time_not_divided = round_time_remaining % 60_000;
-            seconds = remaing_time_not_divided / 1000;
 
-            return {minutes, seconds}                       // Returns an object wrapper, which returns the minutes and seconds
-        }
-
-        function round_timer_func () {
-            const timer_display = document.getElementById("round_timer_display");
-            let time_remaing = calculate_time_remaining(round_time_remaining);
-            let minutes = time_remaing.minutes.toString().padStart(2, '0');              // Forces minutes appear as two digits. So 1 => 01
-            let seconds = time_remaing.seconds.toString().padStart(2, '0');              // Makes seconds to appear as two digits. So 4 => 04
+            // Floors both, so neither has decimal places, and so minutes doesn't count the seconds  
+            minutes = Math.floor(time_remaining / 60_000);               // 60_000 = (secs in a minute) * (seconds in a microsecond) = 60 * 1000
+            seconds = Math.floor( (time_remaining % 60_000) / 1000);     // Calculates the number of seconds
             
-            timer_display.innerText = minutes + ":" + seconds;
+            return {minutes, seconds}                                    // Returns an wrapper object, which holds the minutes and seconds remaining on the timer
         }   
-        
+
+        function update_timer_function() {
+            const timer_display = document.getElementById("round_timer_display");
+            const display_update_interval = 1_000;              // Update every second
+
+            let timer_interval = setInterval(function () {
+                let time_remaining_min_sec = calculate_time_remaining(time_remaining);
+                let minutes = time_remaining_min_sec.minutes.toString().padStart(2, '0');       // Forces the minute to have a ones and a tens place number
+                let seconds = time_remaining_min_sec.seconds.toString().padStart(2, '0');       // Forces the seconds to have a ones and a tens place number
+
+                // Update the display
+                timer_display.innerText = minutes + ":" + seconds;                
+
+                // Update the time remaing
+                time_remaining -= display_update_interval;
+
+                // Check to see if the timer has reached zero
+                if (minutes === "00" && seconds == "00") {
+                    clearInterval(timer_interval);
+                    timer.innerText = minutes + ":" + seconds;
+                }
+                
+            }, display_update_interval) 
+
+        }
 
     </script>
 </html>
+
+<!--TODO
+
+- Find a way to allow to restart the game by pressing the button again.
+
+-->
