@@ -8,117 +8,76 @@
     </head>
     
     <body>
-        <!--Buttons------->
+        <!--Buttons-->
+
+            <!--Hole Buttons-->
+            <p>
+                <button id = "hole_1" class="hole_button" onclick="check_hole()"></button>
+                <button id = "hole_2" class="hole_button" onclick="check_hole()"></button>
+                <button id = "hole_3" class="hole_button" onclick="check_hole()"></button>
+            </p>
+            <p>
+                <button id = "hole_4" class="hole_button" onclick="check_hole()"></button>
+                <button id = "hole_6" class="hole_button" onclick="check_hole()"></button>
+                <button id = "hole_5" class="hole_button" onclick="check_hole()"></button>
+            </p>
+            <p>
+                <button id = "hole_7" class="hole_button" onclick="check_hole()"></button>
+                <button id = "hole_8" class="hole_button" onclick="check_hole()"></button>
+                <button id = "hole_9" class="hole_button" onclick="check_hole()"></button>
+            </p>    
+
+            <!--Difficulty Button-->
+            <p>
+                <button id = "easy_button" class = "easy_button_class" onclick="game_settings.change_difficulty(Difficulty_modes.EASY)">Easy</button>
+                <button id = "intermediate_button" class="intermediate_button_class" onclick="game_settings.change_difficulty(Difficulty_modes.INTERMEDIATE)">Intermediate</button>
+                <button id = "hard_button" class = "hard_button_class" onclick="game_settings.change_difficulty(Difficulty_modes.HARD)">Hard</button>
+            </p>
+            
+            <!--Start Button-->
+            <p>
+                <button id = "start_button" class = "start_button_class" onclick="start_game()">Start</button>
+            </p>
         
+        <!--Timer-->
         <p>
-            <button id="button_1" class="whack-a-button" onclick="check_hole()" ></button>
-            <button id="button_2" class="whack-a-button" onclick="check_hole()"></button>
-            <button id="button_3" class="whack-a-button" onclick="check_hole()"></button>
-        </p>
-        <p> 
-            <button id="button_4" class="whack-a-button" onclick="check_hole()"></button>
-            <button id="button_5" class="whack-a-button" onclick="check_hole()"></button>
-            <button id="button_6" class="whack-a-button" onclick="check_hole()"></button>
-        </p>
-        <p>
-            <button id="button_7" class="whack-a-button" onclick="check_hole()"></button>
-            <button id="button_9" class="whack-a-button" onclick="check_hole()"></button>
-            <button id="button_8" class="whack-a-button" onclick="check_hole()"></button>
+            <h1 id = "round_timer_display">Timer</h1>
         </p>
 
-        <p>
-            <button id="start_round_button" class="start_button" onclick="update_timer_function()">Start Round</button>
-        </p>
-
-        <!--Difficulty Buttons-->
-        <p>
-            <button id="easy_button" class="easy_button_class" onclick="difficulty_settings.change_difficulty(difficulty_mode.Easy)">Easy</button>
-            <button id="intermediate_button" class="intermediate_button_class" onclick="difficulty_settings.change_difficulty(difficulty_mode.Intermediate)">Intermediate</button>
-            <button id="hard_button" class="hard_button_class" onclick="difficulty_settings.change_difficulty(difficulty_mode.Hard)">Hard</button>
-        </p>
-
-        <!--Round Timer----->
-        <h1 id="round_timer_display">Timer</h1>
-
-
-        
     </body>
 
     <script>
-        // Timer stuff
-        const start_timer = 45_000;
-        let time_remaining = start_timer;
-
-        function calculate_time_remaining (time_remaining) {
-            let minutes, seconds;
-
-            // Floors both, so neither has decimal places, and so minutes doesn't count the seconds  
-            minutes = Math.floor(time_remaining / 60_000);               // 60_000 = (secs in a minute) * (seconds in a microsecond) = 60 * 1000
-            seconds = Math.floor( (time_remaining % 60_000) / 1000);     // Calculates the number of seconds
-            
-            return {minutes, seconds}                                    // Returns an wrapper object, which holds the minutes and seconds remaining on the timer
-        }   
-
-        function update_timer_function() {
-            const timer_display = document.getElementById("round_timer_display");
-            const display_update_interval = 1_000;              // Update every second
-
-            let timer_interval = setInterval(function () {
-                let time_remaining_min_sec = calculate_time_remaining(time_remaining);
-                let minutes = time_remaining_min_sec.minutes.toString().padStart(2, '0');       // Forces the minute to have a ones and a tens place number
-                let seconds = time_remaining_min_sec.seconds.toString().padStart(2, '0');       // Forces the seconds to have a ones and a tens place number
-
-                // Update the display
-                timer_display.innerText = minutes + ":" + seconds;                
-
-                // Update the time remaing
-                time_remaining -= display_update_interval;
-
-                // Check to see if the timer has reached zero
-                if (minutes === "00" && seconds == "00") {
-                    clearInterval(timer_interval);
-                    timer.innerText = minutes + ":" + seconds;
-                }
-                
-            }, display_update_interval) 
-
-        }
-
-        // Difficulty Stuff
-        
-        // Enum for game difficulty
-        let difficulty_mode = {
-            Easy: "easy",
-            Intermediate: "intermediate",
-            Hard: "hard"
+        // Constants
+        const Difficulty_modes = {
+            EASY: "easy",
+            INTERMEDIATE: "intermediate",
+            HARD: "hard"
         };
-        
+
         class DifficultyInfo {
-            
-            
             constructor () {
-                this.difficulty = difficulty_mode.Intermediate;
+                this.difficulty = Difficulty_modes.INTERMEDIATE;
                 this.min_mole_time = 4_000;
                 this.max_mole_time = 6_000;
                 this.max_mole_ammount = 4;
             }
-            
+
             change_difficulty(mode) {
                 switch (mode) {
-                    case difficulty_mode.Easy:
-                        this.modify_difficulty(difficulty_mode.Easy, 5_000, 8_000, 2);
+                    case Difficulty_modes.EASY:
+                        this.modify_difficulty(Difficulty_modes.EASY, 5_000, 8_000, 2);
                         break;
-                    case difficulty_mode.Intermediate:
-                        this.modify_difficulty(difficulty_mode.Intermediate, 4_000, 6_000, 4);
+                    case Difficulty_modes.INTERMEDIATE:
+                        this.modify_difficulty(Difficulty_modes.INTERMEDIATE, 4_000, 6_000, 4);
                         break;
-                    case difficulty_mode.Hard:
-                        this.modify_difficulty(difficulty_mode.Hard, 2_000, 3_000, 6);
+                    case Difficulty_modes.HARD:
+                        this.modify_difficulty(Difficulty_modes.HARD, 2_000, 3_000, 6);
                         break;
                 }
                 console.log(`Difficulty Info: ${this.difficulty} ${this.min_mole_time} ${this.max_mole_time} ${this.max_mole_ammount}`);
             }
-
-            modify_difficulty (selected_difficulty, min_time, max_time, max_ammount) {
+            
+            modify_difficulty(selected_difficulty, min_time, max_time, max_ammount) {
                 this.difficulty = selected_difficulty;
                 this.min_mole_time = min_time;
                 this.max_mole_time = max_time;
@@ -126,7 +85,53 @@
             }
         }
 
-        const difficulty_settings = new DifficultyInfo();
+
+        class Timer {
+            calculate_time_remaining (time_remaining) {
+                let minutes, seconds;
+
+                // Floors both, so neither has decimal places, and so minutes doesn't count the seconds
+                minutes = Math.floor(time_remaining / 60_000);
+                seconds = Math.floor( (time_remaining % 60_000) / 1_000);
+
+                // Return an object which contains the minutes and seconds;
+                return {minutes, seconds};
+            }
+
+            update_timer_function () {
+                let timer_remaining = 45_000;
+                const timer_dislay = document.getElementById("round_timer_display");
+                const display_update_interval = 1_000;
+                let timer_interval = NULL;
+                
+                timer_interval = setInterval(function () {
+                    let time_remaining_object = calculate_time_remaining(timer_remaining);
+                    let minutes = time_remaining_object.toString().padStrart(2, '0'); // Forces there to be at least two zeros for the time
+                    let seconds = time_remaining_object.toString().padStart(2, '0');
+
+                    // Update the display
+                    timer_dislay.innerText = minutes + ":" + seconds;
+
+                    // Update the time remaining
+                    time_remaining -= display_update_interval;
+
+                    // Check to see if the timer has reached zero
+                    if (minutes === "00" && seconds === "00") {
+                        clearInterval(timer_interval);
+                        timer.innerText = minutes + ":" + seconds;
+                    }
+
+                }, display_update_interval);
+            }
+
+        }
+
+        function main () {
+            game_settings = new DifficultyInfo();
+            console.log(`Difficulty Info From Main: ${game_settings.difficulty} ${game_settings.min_mole_time} ${game_settings.max_mole_time} ${game_settings.max_mole_ammount}\n`);
+            
+        }
+        main();
 
     </script>
 </html>
@@ -134,7 +139,10 @@
 <!--TODO
 
 - Find a way to allow to restart the game by pressing the button again.
-- Set a default difficulty 
-- Find a way to rearange the class difficultyinfo, i.e. make a better constructor
 
+Timer:
+    - Make the timer say th
+
+Difficulty:
+    - Make the start button prevent difficulty from changing after starting
 -->
