@@ -26,18 +26,29 @@
             <button id="button_8" class="whack-a-button" onclick="check_hole()"></button>
         </p>
 
-        <button id="start_round_button" class="btn" onclick="update_timer_function()">Start Round</button>
+        <p>
+            <button id="start_round_button" class="start_button" onclick="update_timer_function()">Start Round</button>
+        </p>
+
+        <!--Difficulty Buttons-->
+        <p>
+            <button id="easy_button" class="easy_button_class" onclick="difficulty_settings.change_difficulty(difficulty_mode.Easy)">Easy</button>
+            <button id="intermediate_button" class="intermediate_button_class" onclick="difficulty_settings.change_difficulty(difficulty_mode.Intermediate)">Intermediate</button>
+            <button id="hard_button" class="hard_button_class" onclick="difficulty_settings.change_difficulty(difficulty_mode.Hard)">Hard</button>
+        </p>
 
         <!--Round Timer----->
         <h1 id="round_timer_display">Timer</h1>
+
+
         
     </body>
 
     <script>
-        const start_timer = 5_000;
+        // Timer stuff
+        const start_timer = 45_000;
         let time_remaining = start_timer;
 
-        
         function calculate_time_remaining (time_remaining) {
             let minutes, seconds;
 
@@ -73,11 +84,57 @@
 
         }
 
+        // Difficulty Stuff
+        
+        // Enum for game difficulty
+        let difficulty_mode = {
+            Easy: "easy",
+            Intermediate: "intermediate",
+            Hard: "hard"
+        };
+        
+        class DifficultyInfo {
+            
+            
+            constructor () {
+                this.difficulty = difficulty_mode.Intermediate;
+                this.min_mole_time = 4_000;
+                this.max_mole_time = 6_000;
+                this.max_mole_ammount = 4;
+            }
+            
+            change_difficulty(mode) {
+                switch (mode) {
+                    case difficulty_mode.Easy:
+                        this.modify_difficulty(difficulty_mode.Easy, 5_000, 8_000, 2);
+                        break;
+                    case difficulty_mode.Intermediate:
+                        this.modify_difficulty(difficulty_mode.Intermediate, 4_000, 6_000, 4);
+                        break;
+                    case difficulty_mode.Hard:
+                        this.modify_difficulty(difficulty_mode.Hard, 2_000, 3_000, 6);
+                        break;
+                }
+                console.log(`Difficulty Info: ${this.difficulty} ${this.min_mole_time} ${this.max_mole_time} ${this.max_mole_ammount}`);
+            }
+
+            modify_difficulty (selected_difficulty, min_time, max_time, max_ammount) {
+                this.difficulty = selected_difficulty;
+                this.min_mole_time = min_time;
+                this.max_mole_time = max_time;
+                this.max_mole_ammount = max_ammount;
+            }
+        }
+
+        const difficulty_settings = new DifficultyInfo();
+
     </script>
 </html>
 
 <!--TODO
 
 - Find a way to allow to restart the game by pressing the button again.
+- Set a default difficulty 
+- Find a way to rearange the class difficultyinfo, i.e. make a better constructor
 
 -->
