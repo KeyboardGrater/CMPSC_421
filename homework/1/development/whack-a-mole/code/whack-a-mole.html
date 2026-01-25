@@ -36,7 +36,7 @@
             
             <!--Start Button-->
             <p>
-                <button id = "start_button" class = "start_button_class" onclick="start_game()">Start</button>
+                <button id = "start_button" class = "start_button_class" onclick="start_game(game_settings)">Start</button>
             </p>
         
         <!--Timer-->
@@ -60,19 +60,22 @@
                 this.min_mole_time = 4_000;
                 this.max_mole_time = 6_000;
                 this.max_mole_ammount = 4;
+                this.lock_difficulty = false;
             }
 
             change_difficulty(mode) {
-                switch (mode) {
-                    case Difficulty_modes.EASY:
-                        this.modify_difficulty(Difficulty_modes.EASY, 5_000, 8_000, 2);
-                        break;
-                    case Difficulty_modes.INTERMEDIATE:
-                        this.modify_difficulty(Difficulty_modes.INTERMEDIATE, 4_000, 6_000, 4);
-                        break;
-                    case Difficulty_modes.HARD:
-                        this.modify_difficulty(Difficulty_modes.HARD, 2_000, 3_000, 6);
-                        break;
+                if (this.lock_difficulty === false) {
+                    switch (mode) {
+                        case Difficulty_modes.EASY:
+                            this.modify_difficulty(Difficulty_modes.EASY, 5_000, 8_000, 2);
+                            break;
+                        case Difficulty_modes.INTERMEDIATE:
+                            this.modify_difficulty(Difficulty_modes.INTERMEDIATE, 4_000, 6_000, 4);
+                            break;
+                        case Difficulty_modes.HARD:
+                            this.modify_difficulty(Difficulty_modes.HARD, 2_000, 3_000, 6);
+                            break;
+                    }
                 }
                 console.log(`Difficulty Info: ${this.difficulty} ${this.min_mole_time} ${this.max_mole_time} ${this.max_mole_ammount}`);
             }
@@ -82,6 +85,10 @@
                 this.min_mole_time = min_time;
                 this.max_mole_time = max_time;
                 this.max_mole_ammount = max_ammount;
+            }
+
+            lock_difficulty_function () {
+                this.lock_difficulty = true;
             }
         }
 
@@ -99,15 +106,16 @@
             }
 
             update_timer_function () {
-                let timer_remaining = 45_000;
+                let time_remaining = 45_000;
                 const timer_dislay = document.getElementById("round_timer_display");
                 const display_update_interval = 1_000;
-                let timer_interval = NULL;
+
+                clearInterval(this.timer_interval);
                 
-                timer_interval = setInterval(function () {
-                    let time_remaining_object = calculate_time_remaining(timer_remaining);
-                    let minutes = time_remaining_object.toString().padStrart(2, '0'); // Forces there to be at least two zeros for the time
-                    let seconds = time_remaining_object.toString().padStart(2, '0');
+                let timer_interval = setInterval(() => {
+                    let time_remaining_object = this.calculate_time_remaining(time_remaining);
+                    let minutes = time_remaining_object.minutes.toString().padStart(2, '0');    // Forces there to be at least two zeros for the time
+                    let seconds = time_remaining_object.seconds.toString().padStart(2, '0');
 
                     // Update the display
                     timer_dislay.innerText = minutes + ":" + seconds;
@@ -126,8 +134,27 @@
 
         }
 
+        function erase_previous_rounds() {
+            
+        }
+
+        function start_game(game_settings) {
+            // Make sure previous rounds data is wiped
+            erase_previous_rounds();
+
+
+            timer_object = new Timer();
+
+            game_settings.lock_difficulty_function();
+
+            // Makes the timer start ticking
+            timer_object.update_timer_function();
+
+        }
+
         function main () {
             game_settings = new DifficultyInfo();
+        
             console.log(`Difficulty Info From Main: ${game_settings.difficulty} ${game_settings.min_mole_time} ${game_settings.max_mole_time} ${game_settings.max_mole_ammount}\n`);
             
         }
@@ -140,8 +167,8 @@
 
 - Find a way to allow to restart the game by pressing the button again.
 
-Timer:
-    - Make the timer say th
+Start Button:
+    - Find a way to make sure that it cant be click twice
 
 Difficulty:
     - Make the start button prevent difficulty from changing after starting
