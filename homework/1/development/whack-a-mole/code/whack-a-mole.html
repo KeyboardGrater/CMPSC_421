@@ -59,7 +59,7 @@
                 this.difficulty = Difficulty_modes.INTERMEDIATE;
                 this.min_mole_time = 4_000;
                 this.max_mole_time = 6_000;
-                this.max_mole_ammount = 4;
+                this.max_mole_amount = 4;
                 this.lock_difficulty = false;
             }
 
@@ -77,14 +77,14 @@
                             break;
                     }
                 }
-                console.log(`Difficulty Info: ${this.difficulty} ${this.min_mole_time} ${this.max_mole_time} ${this.max_mole_ammount}`);
+                console.log(`Difficulty Info: ${this.difficulty} ${this.min_mole_time} ${this.max_mole_time} ${this.max_mole_amount}`);
             }
             
             modify_difficulty(selected_difficulty, min_time, max_time, max_ammount) {
                 this.difficulty = selected_difficulty;
                 this.min_mole_time = min_time;
                 this.max_mole_time = max_time;
-                this.max_mole_ammount = max_ammount;
+                this.max_mole_amount = max_ammount;
             }
 
             lock_difficulty_function () {
@@ -94,6 +94,9 @@
 
 
         class Timer {
+            constructor () {
+                this.starting_time = 45_000;
+            }
             calculate_time_remaining (time_remaining) {
                 let minutes, seconds;
 
@@ -106,7 +109,7 @@
             }
 
             update_timer_function () {
-                let time_remaining = 45_000;
+                let time_remaining = this.starting_time;
                 const timer_dislay = document.getElementById("round_timer_display");
                 const display_update_interval = 1_000;
 
@@ -134,29 +137,153 @@
 
         }
 
+        
+        
+        
+        
         function erase_previous_rounds() {
             
         }
-
+        
         function start_game(game_settings) {
             // Make sure previous rounds data is wiped
             erase_previous_rounds();
-
-
+            
+            
             timer_object = new Timer();
-
+            
             game_settings.lock_difficulty_function();
-
+            
             // Makes the timer start ticking
             timer_object.update_timer_function();
+            
+        }
 
+        function hole_picker (hole_grid, game_settings, num_active) {
+            let empty_holes = [];
+            let index_picked = -1;
+
+            // Check if the maximum active moles has been reached
+            if (game_settings.max_mole_amount === num_active) {
+                return null;
+            }
+
+            // Keep track of which holes are empty
+            for (let i = 0; i <= hole_grid.length - 1; ++i) {
+                if (hole_grid[i].occupied === false) {
+                    empty_holes.push(i);
+                }
+            }
+            
+            // Randomly pick a index, which has an empty hole, given the empty hole list
+            index_picked = random_number_generator(0, empty_holes.length - 1);
+
+            // Randomly chose the moles surface time, given the difficulty rules
+            hole_grid[index_picked].timeout = random_number_generator(game_settings.min_mole_time, game_settings.max_mole_time);
+
+            // Change the occupancy status of the chosen hole (in hole_grid)
+            hole_grid[index_picked].occupied = true;
+
+            // Update the amount of moles that are currently active
+            num_active++;
+
+            // Return both the index that was picked, and the number of active moles
+            return {index: index_picked, active: num_active};
+        }
+
+        // function mole_pop_up (hole_grid, index, num_active, game_settings) {
+        //     let mole_button_id = "hole_" + index; 
+        //     const mole_button = document.getElementById(mole_button_id);
+
+        //     // Check if the number of active moles has been reached
+        //     if (num_active === game_settings.max_mole_amount) {
+        //         return;
+        //     }
+
+        //     console.log("Inside the mole_pop_up function, before the change in background color");
+
+        //     // Mole appears html
+        //     // Lets just set it to change to the color brown
+        //     mole_button.style.backgroundColor = "black";
+
+        //     // Make the mole disappear after the set amount of time
+        //     const mole_time = setTimeout( () => {
+        //         console.log("Inside the setTimeout in mole_pop_up, before return to original color");
+        //         // For now, I am just going to change the color of the button, back to its original color
+        //         mole_button.style.backgroundColor = "pink";
+
+        //         console.log("Inside the setTimeout in mole_pop_up, after the return to the original color.");
+                
+        //         // Update the occupancy status of the hole
+        //         hole_grid[index].occupied = false;
+    
+        //         // Decrement the number of active moles by 1
+        //         num_active--;
+                
+        //     }, hole_grid[index].timeout);
+
+        //     console.log("Finished the mole_pop_up function");
+        // }
+
+        function mole_pop_up (hole_grid, index, num_active, game_settings) {
+            return new Promise ( () => {
+                const mole_button = document.getElementById("hole_" + index);
+
+                // Check if there is currently the max number of moles
+                if (num_active === game_settings.max_mole_amount) {
+                    return;
+                }
+
+                // Make the mole appear
+                mole_button.style.backgroundColor = "black";
+
+                const mole_lifetime = setTimeout( () => {
+                    // Make the mole disappear
+                    mole_button.style.backgroundColor = "pink";
+                    
+                    // Update the hole occupancy
+                    hole_grid[index].occupied = false;
+
+                    // Update the number of active moles
+                    num_active--;
+                }, hole_grid[index].timeout);
+            });
+        }
+
+        function random_number_generator (min, max) {
+            return Math.floor(Math.random() * (max - min) + min);
         }
 
         function main () {
             game_settings = new DifficultyInfo();
-        
-            console.log(`Difficulty Info From Main: ${game_settings.difficulty} ${game_settings.min_mole_time} ${game_settings.max_mole_time} ${game_settings.max_mole_ammount}\n`);
+            let num_active = 0;
+            // let num_active = {value: 0};
+            let index_picked = -1;
+            timer_obj = new Timer();
+            let repeated_operations_count = 0;
+            let hole_grid = Array(9).fill().map( () => ({occupied: false, timeout: -1}));
+            let hole_picker_obj = {index: -1, active: -1};
             
+        
+            console.log(`Difficulty Info From Main: ${game_settings.difficulty} ${game_settings.min_mole_time} ${game_settings.max_mole_time} ${game_settings.max_mole_amount}\n`);
+            
+            // Find some way that it repeates the mole selection for which ones need to pop up
+
+            while (true) {
+                // Choose a mole that isn't currently up
+                hole_picker_obj = hole_picker(hole_grid, game_settings, num_active);
+                index_picked = hole_picker_obj.index;
+                num_active = hole_picker_obj.active;
+    
+                console.log("Inside the repeated_operations section in main");
+    
+                if (index_picked !== null && index_picked !== -1) {
+                    // Allow a mole to pop out
+                    mole_pop_up(hole_grid, index_picked, num_active, game_settings);
+                }
+
+                console.log("First go around in the main while loop");
+            }
         }
         main();
 
@@ -172,4 +299,8 @@ Start Button:
 
 Difficulty:
     - Make the start button prevent difficulty from changing after starting
+
+
+Main:
+    - Fix the infinite while loop
 -->
