@@ -12,19 +12,19 @@
 
             <!--Hole Buttons-->
             <p>
+                <button id = "hole_0" class="hole_button" onclick="check_hole()"></button>
                 <button id = "hole_1" class="hole_button" onclick="check_hole()"></button>
                 <button id = "hole_2" class="hole_button" onclick="check_hole()"></button>
-                <button id = "hole_3" class="hole_button" onclick="check_hole()"></button>
             </p>
             <p>
+                <button id = "hole_3" class="hole_button" onclick="check_hole()"></button>
                 <button id = "hole_4" class="hole_button" onclick="check_hole()"></button>
-                <button id = "hole_6" class="hole_button" onclick="check_hole()"></button>
                 <button id = "hole_5" class="hole_button" onclick="check_hole()"></button>
             </p>
             <p>
+                <button id = "hole_6" class="hole_button" onclick="check_hole()"></button>
                 <button id = "hole_7" class="hole_button" onclick="check_hole()"></button>
                 <button id = "hole_8" class="hole_button" onclick="check_hole()"></button>
-                <button id = "hole_9" class="hole_button" onclick="check_hole()"></button>
             </p>    
 
             <!--Difficulty Button-->
@@ -164,7 +164,7 @@
             let index_picked = -1;
 
             // Check if the maximum active moles has been reached
-            if (game_settings.max_mole_amount === num_active) {
+            if (num_active.value >= game_settings.max_mole_amount) {
                 return null;
             }
 
@@ -176,7 +176,7 @@
             }
             
             // Randomly pick a index, which has an empty hole, given the empty hole list
-            index_picked = random_number_generator(0, empty_holes.length - 1);
+            index_picked = empty_holes[random_number_generator(0, empty_holes.length - 1)];
 
             // Randomly chose the moles surface time, given the difficulty rules
             hole_grid[index_picked].timeout = random_number_generator(game_settings.min_mole_time, game_settings.max_mole_time);
@@ -185,53 +185,19 @@
             hole_grid[index_picked].occupied = true;
 
             // Update the amount of moles that are currently active
-            num_active++;
+            num_active.value++;
 
             // Return both the index that was picked, and the number of active moles
-            return {index: index_picked, active: num_active};
+            return index_picked;
         }
 
-        // function mole_pop_up (hole_grid, index, num_active, game_settings) {
-        //     let mole_button_id = "hole_" + index; 
-        //     const mole_button = document.getElementById(mole_button_id);
-
-        //     // Check if the number of active moles has been reached
-        //     if (num_active === game_settings.max_mole_amount) {
-        //         return;
-        //     }
-
-        //     console.log("Inside the mole_pop_up function, before the change in background color");
-
-        //     // Mole appears html
-        //     // Lets just set it to change to the color brown
-        //     mole_button.style.backgroundColor = "black";
-
-        //     // Make the mole disappear after the set amount of time
-        //     const mole_time = setTimeout( () => {
-        //         console.log("Inside the setTimeout in mole_pop_up, before return to original color");
-        //         // For now, I am just going to change the color of the button, back to its original color
-        //         mole_button.style.backgroundColor = "pink";
-
-        //         console.log("Inside the setTimeout in mole_pop_up, after the return to the original color.");
-                
-        //         // Update the occupancy status of the hole
-        //         hole_grid[index].occupied = false;
-    
-        //         // Decrement the number of active moles by 1
-        //         num_active--;
-                
-        //     }, hole_grid[index].timeout);
-
-        //     console.log("Finished the mole_pop_up function");
-        // }
-
         function mole_pop_up (hole_grid, index, num_active, game_settings) {
-            return new Promise ( () => {
+            return new Promise ( resolve => {
                 const mole_button = document.getElementById("hole_" + index);
 
                 // Check if there is currently the max number of moles
-                if (num_active === game_settings.max_mole_amount) {
-                    return;
+                if (num_active.value > game_settings.max_mole_amount) {
+                    return null;
                 }
 
                 // Make the mole appear
@@ -239,25 +205,26 @@
 
                 const mole_lifetime = setTimeout( () => {
                     // Make the mole disappear
-                    mole_button.style.backgroundColor = "pink";
+                    mole_button.style.backgroundColor = "brown";
                     
                     // Update the hole occupancy
                     hole_grid[index].occupied = false;
 
                     // Update the number of active moles
-                    num_active--;
+                    num_active.value--;
+
                 }, hole_grid[index].timeout);
             });
         }
 
         function random_number_generator (min, max) {
-            return Math.floor(Math.random() * (max - min) + min);
+            return Math.floor(Math.random() * (max - min + 1) + min);
         }
 
-        function main () {
+        async function main () {
             game_settings = new DifficultyInfo();
-            let num_active = 0;
-            // let num_active = {value: 0};
+            // let num_active = 0;
+            let num_active = {value: 0};
             let index_picked = -1;
             timer_obj = new Timer();
             let repeated_operations_count = 0;
@@ -269,21 +236,22 @@
             
             // Find some way that it repeates the mole selection for which ones need to pop up
 
-            while (true) {
+            const time_interval = setInterval( () => {
                 // Choose a mole that isn't currently up
-                hole_picker_obj = hole_picker(hole_grid, game_settings, num_active);
-                index_picked = hole_picker_obj.index;
-                num_active = hole_picker_obj.active;
-    
-                console.log("Inside the repeated_operations section in main");
-    
-                if (index_picked !== null && index_picked !== -1) {
-                    // Allow a mole to pop out
-                    mole_pop_up(hole_grid, index_picked, num_active, game_settings);
+                if (num_active.value < game_settings.max_mole_amount) {
+                    index_picked = hole_picker(hole_grid, game_settings, num_active);
+                    
+                    console.log(`(PK) Active_mole_num: ${num_active.value}`);
+                    
+                    if (index_picked !== null && index_picked !== -1) {
+                        // Allow a mole to pop out
+                        mole_pop_up(hole_grid, index_picked, num_active, game_settings);
+                        console.log(`(UP) Active_mole_num: ${num_active.value}`);
+                    }
+                    
+                    console.log("First go around in the main while loop");
                 }
-
-                console.log("First go around in the main while loop");
-            }
+            }, 1_000);
         }
         main();
 
@@ -303,4 +271,6 @@ Difficulty:
 
 Main:
     - Fix the infinite while loop
+
+Search for an FIXME
 -->
