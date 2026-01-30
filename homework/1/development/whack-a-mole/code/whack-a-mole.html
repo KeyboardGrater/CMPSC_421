@@ -137,28 +137,6 @@
 
         }
 
-        
-        
-        
-        
-        function erase_previous_rounds() {
-            
-        }
-        
-        function start_game(game_settings) {
-            // Make sure previous rounds data is wiped
-            erase_previous_rounds();
-            
-            
-            timer_object = new Timer();
-            
-            game_settings.lock_difficulty_function();
-            
-            // Makes the timer start ticking
-            timer_object.update_timer_function();
-            
-        }
-
         function hole_picker (hole_grid, game_settings, num_active) {
             let empty_holes = [];
             let index_picked = -1;
@@ -221,20 +199,30 @@
             return Math.floor(Math.random() * (max - min + 1) + min);
         }
 
-        async function main () {
-            game_settings = new DifficultyInfo();
-            // let num_active = 0;
+        function erase_previous_rounds() {
+            
+        }
+        
+        function start_game(game_settings) {
+            // Make sure previous rounds data is wiped
+            erase_previous_rounds();
+            
+            
+            timer_object = new Timer();
+            
+            game_settings.lock_difficulty_function();
+            
+            // Makes the timer start ticking
+            timer_object.update_timer_function();
+            
+            round_in_progress(game_settings);
+        }
+
+        function round_in_progress (game_settings) {
             let num_active = {value: 0};
             let index_picked = -1;
-            timer_obj = new Timer();
-            let repeated_operations_count = 0;
             let hole_grid = Array(9).fill().map( () => ({occupied: false, timeout: -1}));
             let hole_picker_obj = {index: -1, active: -1};
-            
-        
-            console.log(`Difficulty Info From Main: ${game_settings.difficulty} ${game_settings.min_mole_time} ${game_settings.max_mole_time} ${game_settings.max_mole_amount}\n`);
-            
-            // Find some way that it repeates the mole selection for which ones need to pop up
 
             const time_interval = setInterval( () => {
                 // Choose a mole that isn't currently up
@@ -252,6 +240,16 @@
                     console.log("First go around in the main while loop");
                 }
             }, 1_000);
+        }
+            
+        function main () {
+            game_settings = new DifficultyInfo();
+            
+            console.log(`Difficulty Info From Main: ${game_settings.difficulty} ${game_settings.min_mole_time} ${game_settings.max_mole_time} ${game_settings.max_mole_amount}\n`);
+            
+            // When button is clicked 
+
+            
         }
         main();
 
