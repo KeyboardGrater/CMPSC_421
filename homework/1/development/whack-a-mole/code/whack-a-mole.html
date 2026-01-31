@@ -82,11 +82,11 @@
                 console.log(`Difficulty Info: ${this.difficulty} ${this.min_mole_time} ${this.max_mole_time} ${this.max_mole_amount}`);
             }
             
-            modify_difficulty(selected_difficulty, min_time, max_time, max_ammount) {
+            modify_difficulty(selected_difficulty, min_time, max_time, max_amount) {
                 this.difficulty = selected_difficulty;
                 this.min_mole_time = min_time;
                 this.max_mole_time = max_time;
-                this.max_mole_amount = max_ammount;
+                this.max_mole_amount = max_amount;
             }
 
             disable_diff_buttons() {
@@ -114,7 +114,7 @@
 
             update_timer_function () {
                 let time_remaining = this.starting_time;
-                const timer_dislay = document.getElementById("round_timer_display");
+                const timer_display = document.getElementById("round_timer_display");
                 const display_update_interval = 1_000;
 
                 clearInterval(this.timer_interval);
@@ -125,7 +125,7 @@
                     let seconds = time_remaining_object.seconds.toString().padStart(2, '0');
 
                     // Update the display
-                    timer_dislay.innerText = minutes + ":" + seconds;
+                    timer_display.innerText = minutes + ":" + seconds;
 
                     // Update the time remaining
                     time_remaining -= display_update_interval;
@@ -231,7 +231,7 @@
             // Update the graphic 
             document.getElementById(`hole_${index}`).style.backgroundColor = "brown";
 
-            // Give the person some leway
+            // Give the person some leeway
         }
 
         function erase_previous_rounds() {
