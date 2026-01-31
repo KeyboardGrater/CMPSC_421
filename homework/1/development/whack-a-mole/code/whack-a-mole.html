@@ -219,9 +219,12 @@
             timer_object.update_timer_function();
             
             round_in_progress(game_settings);
+
+            
         }
 
         function round_in_progress (game_settings) {
+            let time_on_clock = 45_000;
             let num_active = {value: 0};
             let index_picked = -1;
             let hole_grid = Array(9).fill().map( () => ({occupied: false, timeout: -1}));
@@ -242,9 +245,14 @@
                     
                     console.log("First go around in the main while loop");
                 }
+                // Stop this interval loop after the set amount of time.
+                setTimeout( () => {
+                    clearInterval(time_interval);
+                }, time_on_clock);
             }, 1_000);
+
         }
-            
+        
         function main () {
             game_settings = new DifficultyInfo();
             
