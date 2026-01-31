@@ -12,19 +12,19 @@
 
             <!--Hole Buttons-->
             <p>
-                <button id = "hole_0" class="hole_button" onclick="check_hole()"></button>
-                <button id = "hole_1" class="hole_button" onclick="check_hole()"></button>
-                <button id = "hole_2" class="hole_button" onclick="check_hole()"></button>
+                <button id = "hole_0" class="hole_button" onclick="check_hole(0)"></button>
+                <button id = "hole_1" class="hole_button" onclick="check_hole(1)"></button>
+                <button id = "hole_2" class="hole_button" onclick="check_hole(2)"></button>
             </p>
             <p>
-                <button id = "hole_3" class="hole_button" onclick="check_hole()"></button>
-                <button id = "hole_4" class="hole_button" onclick="check_hole()"></button>
-                <button id = "hole_5" class="hole_button" onclick="check_hole()"></button>
+                <button id = "hole_3" class="hole_button" onclick="check_hole(3)"></button>
+                <button id = "hole_4" class="hole_button" onclick="check_hole(4)"></button>
+                <button id = "hole_5" class="hole_button" onclick="check_hole(5)"></button>
             </p>
             <p>
-                <button id = "hole_6" class="hole_button" onclick="check_hole()"></button>
-                <button id = "hole_7" class="hole_button" onclick="check_hole()"></button>
-                <button id = "hole_8" class="hole_button" onclick="check_hole()"></button>
+                <button id = "hole_6" class="hole_button" onclick="check_hole(6)"></button>
+                <button id = "hole_7" class="hole_button" onclick="check_hole(7)"></button>
+                <button id = "hole_8" class="hole_button" onclick="check_hole(8)"></button>
             </p>    
 
             <!--Difficulty Button-->
@@ -42,6 +42,11 @@
         <!--Timer-->
         <p>
             <h1 id = "round_timer_display">Timer</h1>
+        </p>
+
+        <!--Score-->
+        <p>
+            <h1 id = "score_card">Score: 0</h1>
         </p>
 
     </body>
@@ -198,6 +203,37 @@
             return Math.floor(Math.random() * (max - min + 1) + min);
         }
 
+        // Score Section
+        let score = 0;
+
+        // Check if the hole has a mole (+ 10 points), or not (-10 points)
+        function check_hole(index) {
+            // Check if the hole is occupied or not
+            if (hole_grid[index].occupied === true) {
+                score += 10;
+            }
+            else {
+                score -= 10;
+            }
+
+            // Cause the mole to go back under
+            mole_hit(index);
+
+            // Update the score
+            const score_display = document.getElementById("score_card");
+            score_display.innerText = `Score: ${score}`;
+        }
+
+        function mole_hit(index) {
+            // Update the occupancy of the hole
+            hole_grid[index].occupied = false;
+
+            // Update the graphic 
+            document.getElementById(`hole_${index}`).style.backgroundColor = "brown";
+
+            // Give the person some leway
+        }
+
         function erase_previous_rounds() {
             
         }
@@ -217,17 +253,20 @@
 
             // Makes the timer start ticking
             timer_object.update_timer_function();
+
+            // Display the score
             
             round_in_progress(game_settings);
 
             
         }
 
+        let hole_grid = Array(9).fill().map( () => ({occupied: false, timeout: -1}));
+
         function round_in_progress (game_settings) {
             let time_on_clock = 45_000;
             let num_active = {value: 0};
             let index_picked = -1;
-            let hole_grid = Array(9).fill().map( () => ({occupied: false, timeout: -1}));
             let hole_picker_obj = {index: -1, active: -1};
 
             const time_interval = setInterval( () => {
@@ -247,6 +286,10 @@
                 }
                 // Stop this interval loop after the set amount of time.
                 setTimeout( () => {
+                    // Stop the score keeping, by disabling all of the buttons
+                    for (let i = 0; i < hole_grid.length; ++i) {
+                        document.getElementById(`hole_${i}`).disabled = "true";
+                    }
                     clearInterval(time_interval);
                 }, time_on_clock);
             }, 1_000);
