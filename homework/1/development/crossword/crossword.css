@@ -1,0 +1,45 @@
+/* Table CSS
+table {
+    text-align: center;
+    padding: 10px;
+    font-family: 'Times New Roman', Times, serif;
+}
+
+td {
+    width: 30px;
+    height: 30px;
+}
+*/ 
+
+/* .dark {
+    background: #033;
+}
+*/
+
+/*
+.input {
+    width: 30px;
+    height: 30px;
+    font-size: 24px;
+    text-align: center;
+    border: 2px solid #222;
+}
+*/
+
+/* Buttons */
+
+    /* Difficulty Buttons */
+    .easy_button {
+        background-color: green;
+    }
+    .intermediate_button {
+        background-color: yellow;
+    }
+    .hard_button {
+        background-color: red;
+    }
+
+    /* Draw Board Button */
+    .draw_button {
+        background-color: blue;
+        }
