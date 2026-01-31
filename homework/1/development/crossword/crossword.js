@@ -41,32 +41,30 @@ class DifficultyInfo {
     }
 }
 
-function draw_board(game_difficulty) {
-    let row_num = game_difficulty.grid_dimensions.width;
-    let col_num = game_difficulty.grid_dimensions.height;
+function draw_board (game_difficulty) {
+    let row_count = game_difficulty.grid_dimensions.width;
+    let col_count = game_difficulty.grid_dimensions.height;
+    const board = document.createElement('table');
 
-    // Create the table
-    const table = document.querySelector("#dynamicTable table");
-    
-    // Create the rows and columns
-    for (let i = 0; i < row_num; ++i) {
-        const row = document.createElement("tr");               // Create a new row
-        for (let j = 0; j < col_num; ++j) {
-            const column = document.createElement("td");        // Create a new column 
-            row.appendChild(column);                            // Append the column, as a child, to the row
+    // Create the board divisions
+    for (let i = 0; i < row_count; ++i) {
+        const row = document.createElement('tr');               // Create a row
+        for (let j = 0; j < col_count; ++j) {
+            const cell = document.createElement('td');          // Create a cell
+            row.appendChild(cell);                              // Make the new cell a child of the most recent row
         }
-        table.appendChild(row);                                 // Append the row, as a child, to the table
+        board.appendChild(row);                                 // Make the most recent row a child of the board
     }
-    // FamilyTree: GrandParent: table, Parent: row, Child: column
 
+    // Adds the board onto the webpage
+    document.getElementById('board').appendChild(board)
+}
+
+function start_game () {
 
 }
 
-function start_game() {
-
-}
-
-function main() {
+function main () {
 
 }
 main();
