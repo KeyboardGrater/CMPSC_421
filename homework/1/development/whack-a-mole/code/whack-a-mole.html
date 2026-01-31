@@ -36,7 +36,7 @@
             
             <!--Start Button-->
             <p>
-                <button id = "start_button" class = "start_button_class" onclick="start_game(game_settings)">Start</button>
+                <button id = "start_button" class = "start_button_class" onclick="start_game(game_settings);">Start</button>
             </p>
         
         <!--Timer-->
@@ -60,11 +60,9 @@
                 this.min_mole_time = 4_000;
                 this.max_mole_time = 6_000;
                 this.max_mole_amount = 4;
-                this.lock_difficulty = false;
             }
 
             change_difficulty(mode) {
-                if (this.lock_difficulty === false) {
                     switch (mode) {
                         case Difficulty_modes.EASY:
                             this.modify_difficulty(Difficulty_modes.EASY, 5_000, 8_000, 2);
@@ -75,7 +73,6 @@
                         case Difficulty_modes.HARD:
                             this.modify_difficulty(Difficulty_modes.HARD, 2_000, 3_000, 6);
                             break;
-                    }
                 }
                 console.log(`Difficulty Info: ${this.difficulty} ${this.min_mole_time} ${this.max_mole_time} ${this.max_mole_amount}`);
             }
@@ -87,8 +84,10 @@
                 this.max_mole_amount = max_ammount;
             }
 
-            lock_difficulty_function () {
-                this.lock_difficulty = true;
+            disable_diff_buttons() {
+                document.getElementById("easy_button").disabled = "true";
+                document.getElementById("intermediate_button").disabled = "true";
+                document.getElementById("hard_button").disabled = "true";
             }
         }
 
@@ -210,8 +209,12 @@
             
             timer_object = new Timer();
             
-            game_settings.lock_difficulty_function();
-            
+            // Disable the difficulty buttons
+            game_settings.disable_diff_buttons();
+        
+            // Disable the starting button
+            document.getElementById("start_button").disabled = "true";
+
             // Makes the timer start ticking
             timer_object.update_timer_function();
             
