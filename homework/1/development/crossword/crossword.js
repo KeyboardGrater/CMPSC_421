@@ -292,7 +292,7 @@ function place_words(grid, word_bank, game_difficulty) {
     const col_num = game_difficulty.grid_dimensions.height
     let placed = false;
     let attempts = 0;
-    let word_orientation = Array.from( {length: word_bank.length}, () => ({word: null, direction: ""}));    // Makes it eaiser to allign clues with the direction of their word
+    let word_orientation = Array.from( {length: max_across + max_down}, () => ({word: null, direction: ""}));    // Makes it eaiser to allign clues with the direction of their word
     let index = 0;
 
     for (const word of word_bank) {
@@ -320,12 +320,11 @@ function place_words(grid, word_bank, game_difficulty) {
                 grid = place_word_in_grid(grid, word, direction, row, col);
                 word_orientation[index].word = word;
                 word_orientation[index].direction = direction;
-
+                index++;
             }
             // Increase attempts, if we cannot place it here
             attempts++;
         }
-        index++;
     }
 
     // Returns the updated grid, and word_orientation.    
@@ -339,8 +338,12 @@ function assign_direction (across, down, max_across, max_down) {
     const weight_importance = 1;
     let summation = 0;
 
-    summation = Math.random() + (weight_importance * (down_sum - across_sum));
-    return summation < 0.5 ? "across" : "down";
+    summation = weight_importance * (down_sum - across_sum);
+    if (max_across !== across && max_down !== down) {
+        summation += Math.random();
+    }
+
+    return summation < 0 ? "across" : "down";
 }
 
 
@@ -385,19 +388,22 @@ function fill_in_html(grid, game_difficulty) {
 }
 
 function start_round(game_difficulty) {
+
     // Create empty board and data array
     draw_board(game_difficulty);                                // Generate the crossword board html
     let grid = create_empty_grid_array(game_difficulty);        // Create the board array, which is used to track the board
     
-    // Handel word bank and hints data
+    // Handle word bank and hints data
     let json_results = json_data;                               // Make the json data into a local mutable object
     json_results = randomize_object_array(json_results);        // Randomize the order of the words, but keep the hints attached to them
-    
     let word_bank = get_word_bank(json_results);                // Get the words from the json_results
     
-    grid = place_words(grid, word_bank, game_difficulty);       // Randomly place the words onto the grid, while keeping track of down and across
+    // Place words operation
+    let place_words_return = place_words(grid, word_bank, game_difficulty);     // Randomly place the words onto the grid, while keeping track of down and across
+    // grid = place_words_return[0];
+
     fill_in_html(grid, game_difficulty);
-    display_hints()
+    // display_hints()
 }
 
 // Deal with data
