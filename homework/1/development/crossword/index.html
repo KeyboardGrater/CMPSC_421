@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>crossword_webpage</title>
+        
+        <!--External Files-->
+        <link rel="stylesheet" href="crossword.css">
+        <script src="crossword.js"></script>
+    </head>
+
+    <body>
+
+
+        <!--Buttons-->
+            <!--Difficulty Buttons-->
+            <p>
+                <button id="easy_button" class="easy_button" onclick="game_difficulty.change_difficulty(difficulty_options.EASY)">Easy</button>
+                <button id="intermediate_button" class="intermediate_button" onclick="game_difficulty.change_difficulty(difficulty_options.INTERMEDIATE)">Intermediate</button>
+                <button id="hard_button" class="hard_button" onclick="game_difficulty.change_difficulty(difficulty_options.HARD)">Hard</button>
+            </p>
+            
+            <!-- Draw Board -->
+            <!-- <p>
+                <button id="draw_button" class="draw_button" onclick="draw_board(game_difficulty)">Draw Board</button>
+            </p> -->
+            
+            <!--Start Round-->
+            <p>
+                <button id="start_round" class="start_round" onclick="start_round(game_difficulty)">Start</button>
+            </p>
+
+        <!--Board-->
+            <div id="board"></div>
+            
+    </body>
+</html>

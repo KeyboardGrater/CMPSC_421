@@ -1,0 +1,60 @@
+/* Board */
+    table {
+        border-collapse: collapse;
+        /* width: 50%; */
+    }
+    td {
+        width: 20px;
+        height: 20px;
+        border: 1px solid black;
+        text-align: center;
+        aspect-ratio: 1;
+    }
+
+/* table {
+    border-collapse: collapse;
+    width: 100%
+}
+
+td {
+    width: 40px;
+    height: 40px;
+    border: 1px solid black;
+} */
+
+
+/* .board {
+    display: grid;
+    gap: 2px;
+    background-color: black;
+    padding: 2px;
+    width: fit-content;
+} */
+/* .cell {
+    width: 50px;
+    height: 50px;
+    background-color: grey;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Times New Roman', Times, serif;
+} */
+
+
+/* Buttons */
+
+    /* Difficulty Buttons */
+    .easy_button {
+        background-color: green;
+    }
+    .intermediate_button {
+        background-color: yellow;
+    }
+    .hard_button {
+        background-color: red;
+    }
+
+    /* Draw Board Button */
+    .draw_button {
+        background-color: blue;
+        }
