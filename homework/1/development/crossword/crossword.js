@@ -340,20 +340,20 @@ function assign_direction (across, down, max_across, max_down) {
 
 // Randomizer functions
 function randomize_array(array) {
-    let j = 0;
+    let random_index = -1;
 
-    for (let i = 0; i < array.length - 1; --i) {
-        j = Math.floor(Math.random() * (i + 1));
-        let temp = array[i];
-        array[i] = array[j];
-        array[j] = temp;
+    for (let i = array.length - 1; i > 0; i--) {
+        // Calculate the random index
+        random_index = Math.floor(Math.random() * (i + 1));
+        // Swap the elements
+        [array[i],array[random_index]] = [array[random_index], array[i]];
     }
-
     return array;
 }
 function random_number_generator(min, max) {                
     return Math.floor(Math.random() * (max - min + 1) + min );
 }
+
 
 function fill_in_html(grid, game_difficulty) {
     let max_row = game_difficulty.grid_dimensions.height;
@@ -379,7 +379,7 @@ function start_round(game_difficulty) {
     draw_board(game_difficulty);                                // Generate the crossword board html
     let grid = create_empty_grid_array(game_difficulty);        // Create the board array, which is used to track the board
     let word_bank = get_word_bank();                            // Get the words from the json_data
-
+    word_bank = randomize_array(word_bank);                     // Randomize the word bank
     
     grid = place_words(grid, word_bank, game_difficulty);              // Randomly place the words onto the grid, while keeping track of down and across
     fill_in_html(grid, game_difficulty);
