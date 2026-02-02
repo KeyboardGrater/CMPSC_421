@@ -1,5 +1,5 @@
 // Globals
-const json_data = {
+const json_data = Object.freeze ({
     "word_bank": [
         {
             "word": "starter",
@@ -152,7 +152,7 @@ const json_data = {
             "length": 7
         }
     ]
-}
+});
 
 
 // Difficulty 
@@ -350,6 +350,9 @@ function randomize_array(array) {
     }
     return array;
 }
+function randomize_object_array(object) {
+    return randomize_array(object.word_bank);
+}
 function random_number_generator(min, max) {                
     return Math.floor(Math.random() * (max - min + 1) + min );
 }
@@ -376,18 +379,24 @@ function fill_in_html(grid, game_difficulty) {
 }
 
 function start_round(game_difficulty) {
+    // Create empty board and data array
     draw_board(game_difficulty);                                // Generate the crossword board html
     let grid = create_empty_grid_array(game_difficulty);        // Create the board array, which is used to track the board
-    let word_bank = get_word_bank();                            // Get the words from the json_data
-    word_bank = randomize_array(word_bank);                     // Randomize the word bank
     
-    grid = place_words(grid, word_bank, game_difficulty);              // Randomly place the words onto the grid, while keeping track of down and across
+    // Handel word bank and hints data
+    let json_results = json_data;                               // Make the json data into a local mutable object
+    json_results = randomize_object_array(json_results);        // Randomize the order of the words, but keep the hints attached to them
+    
+    let word_bank = get_word_bank(json_results);                // Get the words from the json_results
+    
+    grid = place_words(grid, word_bank, game_difficulty);       // Randomly place the words onto the grid, while keeping track of down and across
     fill_in_html(grid, game_difficulty);
+    display_hints()
 }
 
 // Deal with data
-function get_word_bank () {
-    return json_data.word_bank.map(item => item.word);
+function get_word_bank (json_results) {
+    return json_results.map(item => item.word);
 }
 
 function main () {
@@ -400,3 +409,4 @@ let game_difficulty = new DifficultyInfo();
 
 // Fix width and height everywhere in relation to row and col
 // Attacth the create border to difficulty buttons
+// Look into "col >= max_col - 1" and the row equivalent, in the get place function. I might need to add an exception, for when the last char of a word can end on the edge of the board
