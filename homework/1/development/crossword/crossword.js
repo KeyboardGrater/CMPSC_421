@@ -291,9 +291,9 @@ function place_words(grid, word_bank, game_difficulty) {
     const row_num = game_difficulty.grid_dimensions.width;
     const col_num = game_difficulty.grid_dimensions.height
     let placed = false;
-    
     let attempts = 0;
-    
+    let word_orientation = Array.from( {length: word_bank.length}, () => ({word: null, direction: ""}));    // Makes it eaiser to allign clues with the direction of their word
+    let index = 0;
 
     for (const word of word_bank) {
         attempts = 0;                                           // We reset the number of attempts and if placed each new word
@@ -318,12 +318,18 @@ function place_words(grid, word_bank, game_difficulty) {
                 placed = true;
                 direction === "across" ? across++ : down++;     // Increment which ever direction the word was placed in
                 grid = place_word_in_grid(grid, word, direction, row, col);
+                word_orientation[index].word = word;
+                word_orientation[index].direction = direction;
+
             }
             // Increase attempts, if we cannot place it here
             attempts++;
         }
+        index++;
     }
-    return grid;
+
+    // Returns the updated grid, and word_orientation.    
+    return [grid, word_orientation];
 }
 
 // Weights determine which direction this is going to be in 
@@ -410,3 +416,4 @@ let game_difficulty = new DifficultyInfo();
 // Fix width and height everywhere in relation to row and col
 // Attacth the create border to difficulty buttons
 // Look into "col >= max_col - 1" and the row equivalent, in the get place function. I might need to add an exception, for when the last char of a word can end on the edge of the board
+// Might change direction to be enum's instead of strings
