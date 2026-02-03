@@ -416,6 +416,31 @@ function fill_in_hints(hint_info) {
     hint_text.innerText = across_text + "\n" + down_text;
 }
 
+function create_input_boxes (game_difficulty, word_list) {
+    const max_row = game_difficulty.grid_dimensions.height
+    const max_col = game_difficulty.grid_dimensions.width
+    const max_across = game_difficulty.question_amount.across
+    const max_down = game_difficulty.question_amount.down
+    const across_input_section = document.createElement("div");
+    const down_input_section = document.createElement("div");
+
+    for (let i = 0; i < word_list.length; ++i) {
+        if (word_list[i].direction === "across") {
+            const across_input = document.createElement("input");
+            across_input.type = "text";
+            across_input.id = `text_field_${i}`;
+            across_input_section.appendChild(across_input);
+        }
+        else {
+            const down_input = document.createElement("input");
+            down_input.type = "text";
+            down_input.id = `text_field${i}`;
+            down_input_section.appendChild(down_input);
+        }
+    }
+    document.getElementById("input_fields").appendChild(across_input_section, down_input_section);
+}
+
 function start_round(game_difficulty) {
 
     // Create empty board and data array
@@ -435,6 +460,7 @@ function start_round(game_difficulty) {
 
     fill_in_html(grid, game_difficulty);
     fill_in_hints(word_direction);
+    create_input_boxes(game_difficulty, word_direction);
     
 }
 
@@ -455,3 +481,4 @@ let game_difficulty = new DifficultyInfo();
 // Attacth the create border to difficulty buttons
 // Look into "col >= max_col - 1" and the row equivalent, in the get place function. I might need to add an exception, for when the last char of a word can end on the edge of the board
 // Might change direction to be enum's instead of strings
+// Might shorten create input boxes
