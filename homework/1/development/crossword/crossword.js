@@ -416,16 +416,16 @@ function fill_in_hints(hint_info) {
     hint_text.innerText = across_text + "\n" + down_text;
 }
 
-function create_input_boxes (game_difficulty, word_list) {
-    const max_row = game_difficulty.grid_dimensions.height
-    const max_col = game_difficulty.grid_dimensions.width
-    const max_across = game_difficulty.question_amount.across
-    const max_down = game_difficulty.question_amount.down
-    const across_input_section = document.createElement("div");
-    const down_input_section = document.createElement("div");
+function create_input_boxes (game_difficulty, word_direction) {
+    const across_input_section = document.getElementById("across_input_section");
+    const down_input_section = document.getElementById("down_input_section");
+    
+    // Add the labels to the two sections
+    document.getElementById("across_input_title").innerText = "Across:";
+    document.getElementById("down_input_title").innerText = "Down:";
 
-    for (let i = 0; i < word_list.length; ++i) {
-        if (word_list[i].direction === "across") {
+    for (let i = 0; i < word_direction.length; ++i) {
+        if (word_direction[i].direction === "across") {
             const across_input = document.createElement("input");
             across_input.type = "text";
             across_input.id = `text_field_${i}`;
@@ -434,12 +434,75 @@ function create_input_boxes (game_difficulty, word_list) {
         else {
             const down_input = document.createElement("input");
             down_input.type = "text";
-            down_input.id = `text_field${i}`;
+            down_input.id = `text_field_${i}`;
             down_input_section.appendChild(down_input);
         }
     }
-    document.getElementById("input_fields").appendChild(across_input_section, down_input_section);
+    
+}   
+
+function create_input_checker_button () {
+    // Create the button
+    const input_button = document.createElement("button");
+
+    // Modify the button
+    input_button.id = "check_input_button";
+    input_button.classList.add("input_checker_button");
+    input_button.addEventListener("click", check_input_boxes);
+
+    // This is ugly
+
+    // Append the button to the input button section
+    document.getElementById("input_button_section").appendChild(input_button);
+
 }
+
+
+
+// Checks if the person is correct
+function check_input_boxes() {
+    // Get a list of all the input boxes
+    const across_input_list = document.getElementById("across_input_section").children;
+    const down_input_list = document.getElementById("down_input_section").children;
+    const across_list = Array(across_input_list.length);
+    const down_list = Array(down_input_list.length);
+    const input_list = Array((across_input_list.length + down_input_list.length));
+    const num_questions = Object.freeze(game_difficulty.question_amount.across + game_difficulty.question_amount.down);
+    let all_correct = true;
+    let local_word_list = word_list;
+    let word = "";
+    let input_text = "";
+    let box_string = "";
+
+    // Get the data from the data from each direction section and seperate it into two different arrays
+    for (let i = 0; i < across_input_list.length; ++i) {
+        across_list[i] = across_input_list[i].value;
+    }
+    for (let i = 0; i < down_input_list.length; ++i) {
+        down_list[i] = down_input_list[i].value;
+    }
+
+    // Combine the two list into one list, then check it against the results
+    input_list.concat = across_list.concat(down_list);
+    
+    // Check if those two exist within the map
+    // text_field_${i}
+
+    
+    for (let i = 0; i < num_questions; ++i) {
+        box_string = `text_field_${i}`;
+        if (local_word_list[i].word !== document.getElementById(box_string).value) {
+            all_correct = false;
+            break;
+        }
+        // Otherwise, update the box to be green
+        document.getElementById(box_string).style.backgroundColor = "green";
+    }
+
+    console.log(`Are all of the words correct: ${all_correct}`);
+
+    
+}   
 
 function start_round(game_difficulty) {
 
@@ -458,10 +521,18 @@ function start_round(game_difficulty) {
     // grid = place_words_return[0];                                            // Not needed
     let word_direction = place_words_return[1];
 
+    // Create or modify the html
     fill_in_html(grid, game_difficulty);
     fill_in_hints(word_direction);
     create_input_boxes(game_difficulty, word_direction);
+    create_input_checker_button();
     
+    console.log(`Across: ${word_direction.filter(item => item.direction === "across").map(item => item.word)}`);
+    console.log(`Down ${word_direction.filter(item => item.direction === "down").map(item => item.word)}`);
+    console.log("STOPPER in start round");
+
+    // Create a global varaible because when the button is pressed, it needs acesses to this data
+    globalThis.word_list = word_direction;
 }
 
 // Deal with data
@@ -482,3 +553,4 @@ let game_difficulty = new DifficultyInfo();
 // Look into "col >= max_col - 1" and the row equivalent, in the get place function. I might need to add an exception, for when the last char of a word can end on the edge of the board
 // Might change direction to be enum's instead of strings
 // Might shorten create input boxes
+// Maybe change, the "this is ugly section in create button"
