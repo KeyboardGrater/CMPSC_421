@@ -1,5 +1,5 @@
 // Globals
-const json_data = {
+const json_data = Object.freeze ({
     "word_bank": [
         {
             "word": "starter",
@@ -152,7 +152,7 @@ const json_data = {
             "length": 7
         }
     ]
-}
+});
 
 
 // Difficulty 
@@ -282,7 +282,7 @@ function place_word_in_grid(grid, word, direction, row, col) {
     return grid;                                                // Return the newly updated grid
 }
 
-function place_words(grid, word_bank, game_difficulty) {
+function place_words(grid, json_results, game_difficulty) {
     // Keep track of many words were placed across and how many were placed down
     let across = 0; 
     let down = 0;
@@ -291,13 +291,15 @@ function place_words(grid, word_bank, game_difficulty) {
     const row_num = game_difficulty.grid_dimensions.width;
     const col_num = game_difficulty.grid_dimensions.height
     let placed = false;
-    
     let attempts = 0;
-    
+    let word_orientation = Array.from( {length: max_across + max_down}, () => ({word: null, direction: "", hint: ""}));    // Makes it eaiser to allign clues with the direction of their word
+    let selected_index = 0;
+    let word = "";
 
-    for (const word of word_bank) {
+    for (let i = 0; i < json_results.length; ++i) {
         attempts = 0;                                           // We reset the number of attempts and if placed each new word
         placed = false;
+        word = json_results[i].word;
 
         // Check for exiting the loop, once the max number of across and down has been reached
         if (across === max_across && down === max_down) {
@@ -317,13 +319,26 @@ function place_words(grid, word_bank, game_difficulty) {
             if (can_place(grid, word, direction, row, col, row_num, col_num)) {
                 placed = true;
                 direction === "across" ? across++ : down++;     // Increment which ever direction the word was placed in
+                // console.log(`${i}`);
+                // console.log(selected_index);
+                // console.log(`${word}`);
+                // console.log(json_results);
+                // console.log(word_orientation);
                 grid = place_word_in_grid(grid, word, direction, row, col);
+                // console.log("Below grid placement");
+                word_orientation[selected_index].word = word;
+                // console.log("Below");
+                word_orientation[selected_index].direction = direction;
+                word_orientation[selected_index].hint = json_results[i].clue;
+                selected_index++;
             }
             // Increase attempts, if we cannot place it here
             attempts++;
         }
     }
-    return grid;
+
+    // Returns the updated grid, and word_orientation.    
+    return [grid, word_orientation];
 }
 
 // Weights determine which direction this is going to be in 
@@ -333,8 +348,12 @@ function assign_direction (across, down, max_across, max_down) {
     const weight_importance = 1;
     let summation = 0;
 
-    summation = Math.random() + (weight_importance * (down_sum - across_sum));
-    return summation < 0.5 ? "across" : "down";
+    summation = weight_importance * (down_sum - across_sum);
+    if (max_across !== across && max_down !== down) {
+        summation += Math.random();
+    }
+
+    return summation < 0 ? "across" : "down";
 }
 
 
@@ -349,6 +368,9 @@ function randomize_array(array) {
         [array[i],array[random_index]] = [array[random_index], array[i]];
     }
     return array;
+}
+function randomize_object_array(object) {
+    return randomize_array(object.word_bank);
 }
 function random_number_generator(min, max) {                
     return Math.floor(Math.random() * (max - min + 1) + min );
@@ -375,19 +397,147 @@ function fill_in_html(grid, game_difficulty) {
     }
 }
 
+function fill_in_hints(hint_info) {
+    const hint_text = document.getElementById('hints');
+    let across_text = "Across:\n";
+    let down_text = "Down:\n";
+
+    // Separate the hints into the across_text and down_text strings 
+    for (let i = 0; i < hint_info.length; ++i) {
+        if (hint_info[i].direction === "across") {
+            across_text += `${i + 1}. ${hint_info[i].hint}\n`;
+        }
+        else {
+            down_text += `${i + 1}. ${hint_info[i].hint}\n`;
+        }
+    }
+
+    // Modify the respective html
+    hint_text.innerText = across_text + "\n" + down_text;
+}
+
+function create_input_boxes (game_difficulty, word_direction) {
+    const across_input_section = document.getElementById("across_input_section");
+    const down_input_section = document.getElementById("down_input_section");
+    
+    // Add the labels to the two sections
+    document.getElementById("across_input_title").innerText = "Across:";
+    document.getElementById("down_input_title").innerText = "Down:";
+
+    for (let i = 0; i < word_direction.length; ++i) {
+        if (word_direction[i].direction === "across") {
+            const across_input = document.createElement("input");
+            across_input.type = "text";
+            across_input.id = `text_field_${i}`;
+            across_input_section.appendChild(across_input);
+        }
+        else {
+            const down_input = document.createElement("input");
+            down_input.type = "text";
+            down_input.id = `text_field_${i}`;
+            down_input_section.appendChild(down_input);
+        }
+    }
+    
+}   
+
+function create_input_checker_button () {
+    // Create the button
+    const input_button = document.createElement("button");
+
+    // Modify the button
+    input_button.id = "check_input_button";
+    input_button.classList.add("input_checker_button");
+    input_button.addEventListener("click", check_input_boxes);
+
+    // This is ugly
+
+    // Append the button to the input button section
+    document.getElementById("input_button_section").appendChild(input_button);
+
+}
+
+
+
+// Checks if the person is correct
+function check_input_boxes() {
+    // Get a list of all the input boxes
+    const across_input_list = document.getElementById("across_input_section").children;
+    const down_input_list = document.getElementById("down_input_section").children;
+    const across_list = Array(across_input_list.length);
+    const down_list = Array(down_input_list.length);
+    const input_list = Array((across_input_list.length + down_input_list.length));
+    const num_questions = Object.freeze(game_difficulty.question_amount.across + game_difficulty.question_amount.down);
+    let all_correct = true;
+    let local_word_list = word_list;
+    let word = "";
+    let input_text = "";
+    let box_string = "";
+
+    // Get the data from the data from each direction section and seperate it into two different arrays
+    for (let i = 0; i < across_input_list.length; ++i) {
+        across_list[i] = across_input_list[i].value;
+    }
+    for (let i = 0; i < down_input_list.length; ++i) {
+        down_list[i] = down_input_list[i].value;
+    }
+
+    // Combine the two list into one list, then check it against the results
+    input_list.concat = across_list.concat(down_list);
+    
+    // Check if those two exist within the map
+    // text_field_${i}
+
+    
+    for (let i = 0; i < num_questions; ++i) {
+        box_string = `text_field_${i}`;
+        if (local_word_list[i].word !== document.getElementById(box_string).value) {
+            all_correct = false;
+            break;
+        }
+        // Otherwise, update the box to be green
+        document.getElementById(box_string).style.backgroundColor = "green";
+    }
+
+    console.log(`Are all of the words correct: ${all_correct}`);
+
+    
+}   
+
 function start_round(game_difficulty) {
+
+    // Create empty board and data array
     draw_board(game_difficulty);                                // Generate the crossword board html
     let grid = create_empty_grid_array(game_difficulty);        // Create the board array, which is used to track the board
-    let word_bank = get_word_bank();                            // Get the words from the json_data
-    word_bank = randomize_array(word_bank);                     // Randomize the word bank
     
-    grid = place_words(grid, word_bank, game_difficulty);              // Randomly place the words onto the grid, while keeping track of down and across
+    // Handle word bank and hints data
+    let json_results = json_data;                               // Make the json data into a local mutable object
+    json_results = randomize_object_array(json_results);        // Randomize the order of the words, but keep the hints attached to them
+    // let word_bank = get_word_bank(json_results);                // Get the words from the json_results
+
+
+    // Place words operation
+    let place_words_return = place_words(grid, json_results, game_difficulty);     // Randomly place the words onto the grid, while keeping track of down and across
+    // grid = place_words_return[0];                                            // Not needed
+    let word_direction = place_words_return[1];
+
+    // Create or modify the html
     fill_in_html(grid, game_difficulty);
+    fill_in_hints(word_direction);
+    create_input_boxes(game_difficulty, word_direction);
+    create_input_checker_button();
+    
+    console.log(`Across: ${word_direction.filter(item => item.direction === "across").map(item => item.word)}`);
+    console.log(`Down ${word_direction.filter(item => item.direction === "down").map(item => item.word)}`);
+    console.log("STOPPER in start round");
+
+    // Create a global varaible because when the button is pressed, it needs acesses to this data
+    globalThis.word_list = word_direction;
 }
 
 // Deal with data
-function get_word_bank () {
-    return json_data.word_bank.map(item => item.word);
+function get_word_bank (json_results) {
+    return json_results.map(item => item.word);
 }
 
 function main () {
@@ -400,3 +550,7 @@ let game_difficulty = new DifficultyInfo();
 
 // Fix width and height everywhere in relation to row and col
 // Attacth the create border to difficulty buttons
+// Look into "col >= max_col - 1" and the row equivalent, in the get place function. I might need to add an exception, for when the last char of a word can end on the edge of the board
+// Might change direction to be enum's instead of strings
+// Might shorten create input boxes
+// Maybe change, the "this is ugly section in create button"

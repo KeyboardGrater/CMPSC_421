@@ -57,4 +57,18 @@ td {
     /* Draw Board Button */
     .draw_button {
         background-color: blue;
-        }
+    }
+
+    /* Input Checker Button */
+    .input_checker_button {
+        width: fit-content;
+
+        text-align: center;
+        background-color: grey;
+    }
+    .input_checker_button::before {
+        content: "Check";
+    }
+
+/* Text Boxes */
+    
