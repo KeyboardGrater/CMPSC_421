@@ -391,6 +391,8 @@ function fill_in_html(grid, game_difficulty) {
                 cell.style.backgroundColor = "black";
             }
             else {
+                cell.style.opacity = 0;
+                cell.innerText = grid[i][j];
                 cell.style.background = "white";
             }
         }
@@ -499,8 +501,21 @@ function check_input_boxes() {
         document.getElementById(box_string).style.backgroundColor = "green";
     }
 
-    console.log(`Are all of the words correct: ${all_correct}`);
+    if (all_correct === true) {
+        for (let i = 0; i < game_difficulty.grid_dimensions.height; ++i) {
+            for (let j = 0; j < game_difficulty.grid_dimensions.width; ++j) {
+                const cell_id = `cell-${i}-${j}`;
+                const cell = document.getElementById(cell_id);
 
+                // If the cell is empty (''), then leave it alone
+                if (global_grid[i][j] !== ' ') {
+                    cell.style.opacity = 100;
+                }
+            }
+        }
+    }
+
+    console.log(`Are all of the words correct: ${all_correct}`);
     
 }   
 
@@ -533,6 +548,7 @@ function start_round(game_difficulty) {
 
     // Create a global varaible because when the button is pressed, it needs acesses to this data
     globalThis.word_list = word_direction;
+    globalThis.global_grid = grid;
 }
 
 // Deal with data
