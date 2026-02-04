@@ -442,6 +442,9 @@ function create_input_boxes (game_difficulty, word_direction) {
 }   
 
 function create_input_checker_button () {
+    // Clear the board of any buttons from the previous round
+    document.getElementById("input_button_section").innerHTML = "";
+
     // Create the button
     const input_button = document.createElement("button");
 
