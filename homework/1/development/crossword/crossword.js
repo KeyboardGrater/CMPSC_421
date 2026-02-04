@@ -319,15 +319,8 @@ function place_words(grid, json_results, game_difficulty) {
             if (can_place(grid, word, direction, row, col, row_num, col_num)) {
                 placed = true;
                 direction === "across" ? across++ : down++;     // Increment which ever direction the word was placed in
-                // console.log(`${i}`);
-                // console.log(selected_index);
-                // console.log(`${word}`);
-                // console.log(json_results);
-                // console.log(word_orientation);
                 grid = place_word_in_grid(grid, word, direction, row, col);
-                // console.log("Below grid placement");
                 word_orientation[selected_index].word = word;
-                // console.log("Below");
                 word_orientation[selected_index].direction = direction;
                 word_orientation[selected_index].hint = json_results[i].clue;
                 selected_index++;
@@ -422,6 +415,11 @@ function create_input_boxes (game_difficulty, word_direction) {
     const across_input_section = document.getElementById("across_input_section");
     const down_input_section = document.getElementById("down_input_section");
     
+    // Remove any previous children
+    across_input_section.innerHTML = "";
+    down_input_section.innerHTML = "";
+    
+
     // Add the labels to the two sections
     document.getElementById("across_input_title").innerText = "Across:";
     document.getElementById("down_input_title").innerText = "Down:";
@@ -488,8 +486,6 @@ function check_input_boxes() {
     input_list.concat = across_list.concat(down_list);
     
     // Check if those two exist within the map
-    // text_field_${i}
-
     
     for (let i = 0; i < num_questions; ++i) {
         box_string = `text_field_${i}`;
@@ -528,12 +524,10 @@ function start_round(game_difficulty) {
     // Handle word bank and hints data
     let json_results = json_data;                               // Make the json data into a local mutable object
     json_results = randomize_object_array(json_results);        // Randomize the order of the words, but keep the hints attached to them
-    // let word_bank = get_word_bank(json_results);                // Get the words from the json_results
 
 
     // Place words operation
     let place_words_return = place_words(grid, json_results, game_difficulty);     // Randomly place the words onto the grid, while keeping track of down and across
-    // grid = place_words_return[0];                                            // Not needed
     let word_direction = place_words_return[1];
 
     // Create or modify the html
