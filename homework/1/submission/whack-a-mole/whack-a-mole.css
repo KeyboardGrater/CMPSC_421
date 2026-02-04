@@ -1,0 +1,16 @@
+.hole_button {
+    width: 50px;
+    height: 50px;
+    background-color: brown;
+}
+
+/* Difficulty Buttons */
+.easy_button_class {
+    background-color: green;
+}
+.intermediate_button_class {
+    background-color: yellow;
+}
+.hard_button_class {
+    background-color: red;
+}

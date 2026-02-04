@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <!-- <meta name="viewport" cont -->
+         <title>Whack-a-grid</title>
+         <link rel="stylesheet" href="whack-a-mole.css">
+    </head>
+    
+    <body>
+        <!--Buttons-->
+
+            <!--Hole Buttons-->
+            <p>
+                <button id = "hole_0" class="hole_button" onclick="check_hole(0)"></button>
+                <button id = "hole_1" class="hole_button" onclick="check_hole(1)"></button>
+                <button id = "hole_2" class="hole_button" onclick="check_hole(2)"></button>
+            </p>
+            <p>
+                <button id = "hole_3" class="hole_button" onclick="check_hole(3)"></button>
+                <button id = "hole_4" class="hole_button" onclick="check_hole(4)"></button>
+                <button id = "hole_5" class="hole_button" onclick="check_hole(5)"></button>
+            </p>
+            <p>
+                <button id = "hole_6" class="hole_button" onclick="check_hole(6)"></button>
+                <button id = "hole_7" class="hole_button" onclick="check_hole(7)"></button>
+                <button id = "hole_8" class="hole_button" onclick="check_hole(8)"></button>
+            </p>    
+
+            <!--Difficulty Button-->
+            <p>
+                <button id = "easy_button" class = "easy_button_class" onclick="game_settings.change_difficulty(Difficulty_modes.EASY)">Easy</button>
+                <button id = "intermediate_button" class="intermediate_button_class" onclick="game_settings.change_difficulty(Difficulty_modes.INTERMEDIATE)">Intermediate</button>
+                <button id = "hard_button" class = "hard_button_class" onclick="game_settings.change_difficulty(Difficulty_modes.HARD)">Hard</button>
+            </p>
+            
+            <!--Start Button-->
+            <p>
+                <button id = "start_button" class = "start_button_class" onclick="start_game(game_settings);">Start</button>
+            </p>
+        
+        <!--Timer-->
+        <p>
+            <h1 id = "round_timer_display">Timer</h1>
+        </p>
+
+        <!--Score-->
+        <p>
+            <h1 id = "score_card">Score: 0</h1>
+        </p>
+
+    </body>
+
+    <script>
+        // Constants
+        const Difficulty_modes = {
+            EASY: "easy",
+            INTERMEDIATE: "intermediate",
+            HARD: "hard"
+        };
+
+        class DifficultyInfo {
+            constructor () {
+                this.difficulty = Difficulty_modes.INTERMEDIATE;
+                this.min_mole_time = 4_000;
+                this.max_mole_time = 6_000;
+                this.max_mole_amount = 4;
+            }
+
+            change_difficulty(mode) {
+                    switch (mode) {
+                        case Difficulty_modes.EASY:
+                            this.modify_difficulty(Difficulty_modes.EASY, 5_000, 8_000, 2);
+                            break;
+                        case Difficulty_modes.INTERMEDIATE:
+                            this.modify_difficulty(Difficulty_modes.INTERMEDIATE, 4_000, 6_000, 4);
+                            break;
+                        case Difficulty_modes.HARD:
+                            this.modify_difficulty(Difficulty_modes.HARD, 2_000, 3_000, 6);
+                            break;
+                }
+                console.log(`Difficulty Info: ${this.difficulty} ${this.min_mole_time} ${this.max_mole_time} ${this.max_mole_amount}`);
+            }
+            
+            modify_difficulty(selected_difficulty, min_time, max_time, max_amount) {
+                this.difficulty = selected_difficulty;
+                this.min_mole_time = min_time;
+                this.max_mole_time = max_time;
+                this.max_mole_amount = max_amount;
+            }
+
+            disable_diff_buttons() {
+                document.getElementById("easy_button").disabled = "true";
+                document.getElementById("intermediate_button").disabled = "true";
+                document.getElementById("hard_button").disabled = "true";
+            }
+        }
+
+
+        class Timer {
+            constructor () {
+                this.starting_time = 45_000;
+            }
+            calculate_time_remaining (time_remaining) {
+                let minutes, seconds;
+
+                // Floors both, so neither has decimal places, and so minutes doesn't count the seconds
+                minutes = Math.floor(time_remaining / 60_000);
+                seconds = Math.floor( (time_remaining % 60_000) / 1_000);
+
+                // Return an object which contains the minutes and seconds;
+                return {minutes, seconds};
+            }
+
+            update_timer_function () {
+                let time_remaining = this.starting_time;
+                const timer_display = document.getElementById("round_timer_display");
+                const display_update_interval = 1_000;
+
+                clearInterval(this.timer_interval);
+                
+                let timer_interval = setInterval(() => {
+                    let time_remaining_object = this.calculate_time_remaining(time_remaining);
+                    let minutes = time_remaining_object.minutes.toString().padStart(2, '0');    // Forces there to be at least two zeros for the time
+                    let seconds = time_remaining_object.seconds.toString().padStart(2, '0');
+
+                    // Update the display
+                    timer_display.innerText = minutes + ":" + seconds;
+
+                    // Update the time remaining
+                    time_remaining -= display_update_interval;
+
+                    // Check to see if the timer has reached zero
+                    if (minutes === "00" && seconds === "00") {
+                        clearInterval(timer_interval);
+                    }
+
+                }, display_update_interval);
+            }
+
+        }
+
+        function hole_picker (hole_grid, game_settings, num_active) {
+            let empty_holes = [];
+            let index_picked = -1;
+
+            // Check if the maximum active moles has been reached
+            if (num_active.value >= game_settings.max_mole_amount) {
+                return null;
+            }
+
+            // Keep track of which holes are empty
+            for (let i = 0; i <= hole_grid.length - 1; ++i) {
+                if (hole_grid[i].occupied === false) {
+                    empty_holes.push(i);
+                }
+            }
+            
+            // Randomly pick a index, which has an empty hole, given the empty hole list
+            index_picked = empty_holes[random_number_generator(0, empty_holes.length - 1)];
+
+            // Randomly chose the moles surface time, given the difficulty rules
+            hole_grid[index_picked].timeout = random_number_generator(game_settings.min_mole_time, game_settings.max_mole_time);
+
+            // Change the occupancy status of the chosen hole (in hole_grid)
+            hole_grid[index_picked].occupied = true;
+
+            // Update the amount of moles that are currently active
+            num_active.value++;
+
+            // Return both the index that was picked, and the number of active moles
+            return index_picked;
+        }
+
+        function mole_pop_up (hole_grid, index, num_active, game_settings) {
+            return new Promise ( resolve => {
+                const mole_button = document.getElementById("hole_" + index);
+
+                // Check if there is currently the max number of moles
+                if (num_active.value > game_settings.max_mole_amount) {
+                    return null;
+                }
+
+                // Make the mole appear
+                mole_button.style.backgroundColor = "black";
+
+                const mole_lifetime = setTimeout( () => {
+                    // Make the mole disappear
+                    mole_button.style.backgroundColor = "brown";
+                    
+                    // Update the hole occupancy
+                    hole_grid[index].occupied = false;
+
+                    // Update the number of active moles
+                    num_active.value--;
+
+                }, hole_grid[index].timeout);
+            });
+        }
+
+        function random_number_generator (min, max) {
+            return Math.floor(Math.random() * (max - min + 1) + min);
+        }
+
+        // Score Section
+        let score = 0;
+
+        // Check if the hole has a mole (+ 10 points), or not (-10 points)
+        function check_hole(index) {
+            // Check if the hole is occupied or not
+            if (hole_grid[index].occupied === true) {
+                score += 10;
+            }
+            else {
+                score -= 10;
+            }
+
+            // Cause the mole to go back under
+            mole_hit(index);
+
+            // Update the score
+            const score_display = document.getElementById("score_card");
+            score_display.innerText = `Score: ${score}`;
+        }
+
+        function mole_hit(index) {
+            // Update the occupancy of the hole
+            hole_grid[index].occupied = false;
+
+            // Update the graphic 
+            document.getElementById(`hole_${index}`).style.backgroundColor = "brown";
+
+            // Give the person some leeway
+        }
+
+        function erase_previous_rounds() {
+            
+        }
+        
+        function start_game(game_settings) {
+            // Make sure previous rounds data is wiped
+            erase_previous_rounds();
+            
+            
+            timer_object = new Timer();
+            
+            // Disable the difficulty buttons
+            game_settings.disable_diff_buttons();
+        
+            // Disable the starting button
+            document.getElementById("start_button").disabled = "true";
+
+            // Makes the timer start ticking
+            timer_object.update_timer_function();
+
+            // Display the score
+            
+            round_in_progress(game_settings);
+
+            
+        }
+
+        let hole_grid = Array(9).fill().map( () => ({occupied: false, timeout: -1}));
+
+        function round_in_progress (game_settings) {
+            let time_on_clock = 45_000;
+            let num_active = {value: 0};
+            let index_picked = -1;
+            let hole_picker_obj = {index: -1, active: -1};
+
+            const time_interval = setInterval( () => {
+                // Choose a mole that isn't currently up
+                if (num_active.value < game_settings.max_mole_amount) {
+                    index_picked = hole_picker(hole_grid, game_settings, num_active);
+                    
+                    console.log(`(PK) Active_mole_num: ${num_active.value}`);
+                    
+                    if (index_picked !== null && index_picked !== -1) {
+                        // Allow a mole to pop out
+                        mole_pop_up(hole_grid, index_picked, num_active, game_settings);
+                        console.log(`(UP) Active_mole_num: ${num_active.value}`);
+                    }
+                    
+                    console.log("First go around in the main while loop");
+                }
+                // Stop this interval loop after the set amount of time.
+                setTimeout( () => {
+                    // Stop the score keeping, by disabling all of the buttons
+                    for (let i = 0; i < hole_grid.length; ++i) {
+                        document.getElementById(`hole_${i}`).disabled = "true";
+                    }
+                    clearInterval(time_interval);
+                }, time_on_clock);
+            }, 1_000);
+
+        }
+        
+        function main () {
+            game_settings = new DifficultyInfo();
+            
+            console.log(`Difficulty Info From Main: ${game_settings.difficulty} ${game_settings.min_mole_time} ${game_settings.max_mole_time} ${game_settings.max_mole_amount}\n`);
+            
+            // When button is clicked 
+
+            
+        }
+        main();
+
+    </script>
+</html>
+
+<!--TODO
+
+- Find a way to allow to restart the game by pressing the button again.
+
+Start Button:
+    - Find a way to make sure that it cant be click twice
+
+Difficulty:
+    - Make the start button prevent difficulty from changing after starting
+
+
+Main:
+    - Fix the infinite while loop
+
+Search for an FIXME
+-->
