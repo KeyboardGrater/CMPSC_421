@@ -473,8 +473,6 @@ function check_input_boxes() {
     const num_questions = Object.freeze(game_difficulty.question_amount.across + game_difficulty.question_amount.down);
     let all_correct = true;
     let local_word_list = word_list;
-    let word = "";
-    let input_text = "";
     let box_string = "";
 
     // Get the data from the data from each direction section and seperate it into two different arrays
@@ -540,8 +538,7 @@ function start_round(game_difficulty) {
     create_input_checker_button();
     
     console.log(`Across: ${word_direction.filter(item => item.direction === "across").map(item => item.word)}`);
-    console.log(`Down ${word_direction.filter(item => item.direction === "down").map(item => item.word)}`);
-    console.log("STOPPER in start round");
+    console.log(`Down: ${word_direction.filter(item => item.direction === "down").map(item => item.word)}`);
 
     // Create a global varaible because when the button is pressed, it needs acesses to this data
     globalThis.word_list = word_direction;
