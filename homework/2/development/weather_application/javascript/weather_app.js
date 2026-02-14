@@ -1,4 +1,3 @@
-const api_key = Object.freeze("");
 
 
 // Returns the numerical representation of the text in the text box
@@ -39,12 +38,26 @@ async function get_zip_code () {
 }
 
 async function start_app () {
-    let zip_code = -1
-    // Creation Section
-
+    let zip_code = -1;
+    let country_code = "US";                            // Default to the us county code
+    let lat_long_info = {lat: 100, lon: 100};           // If it displays 100 for either then it is a error
+    const mearsurement_system = "imperial";
+    let weather_info;
+    
     // Action Section
     zip_code = await get_zip_code();                        // Do I need the await hear, if I have the await right were I need it, down the chain
     console.log(`Zip Code: ` + zip_code);
+
+    // After the zip code is obtained, launch the dynamic creation of the api call
+    // create_api_file();
+
+    // Get the latitude and the longitude based of the country and zip code
+    lat_long_info = await get_information(country_code, zip_code);    // Do I need an await here?
+
+    // Get the weather based of the latitude and the longitude
+    weather_info = get_daily_weather(lat_long_info.lat, lat_long_info.lon, mearsurement_system);
+
+
 }
 
 function main () {
@@ -53,3 +66,4 @@ function main () {
 main();
 
 // Maybe add something that disables the enter, or submission button for zip code after you click, or hit enter
+// Do I want the system and langague to be based of the country. And should I give the user, the choice of which system and location the want
