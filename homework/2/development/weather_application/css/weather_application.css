@@ -1,0 +1,48 @@
+
+/* Classes */
+    /* Directional classes */
+    .center {
+        display: flex;
+        justify-content: center;                    /* Centers stuff horizontally */
+        align-items: center;                        /* Centers stuff vertically */
+        height: 100vh;
+    }
+
+    .horizontal-center {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    /* Other */
+    .stack-flexible {
+        display: flex;
+        flex-direction: column;
+        align-items: center
+    }
+
+
+/* Individual ID's */
+    /* Zip code section */
+    #zip-code-text-box {
+
+        height: 30px;
+
+        margin-top: 20px;
+        margin-bottom: 20px;
+
+        text-align: center;
+        font-size: large;
+    }
+    #zip-code-submission-button {
+        /* width: 38px;
+        height: 18px; */
+        width: auto;
+        height: auto;
+        background-color: #b0c4de;
+
+        margin-top: 20px;
+        
+        text-align: center;
+    }
+
