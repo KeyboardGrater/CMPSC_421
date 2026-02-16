@@ -11,38 +11,26 @@ function get_search_box_text() {
     });
 }
 
-function filter_cards(search_text) {
-    const card_section = document.getElementById('card-section');
-    const row_list = card_section.children;
+function filter_cards(search_text, list_of_dog_types) { 
+    // Get all the cards
+    const card_list = document.querySelector(".card");
+    const lower_case_search = search_text.toLowerCase();
 
-    // Loop to get all the cards
-    // row_list.forEach(row => {
-    //     const cards_in_row = row.children;
-    //     cards_in_row.forEach(card => {
-    //         const card_title = card.title;
-    //         // If it is search text is not a substring of the tile of the card, then hide the card
-    //         if (!card_title.includes(search_text)) {
-    //             card.style.display = 'none';
-    //         }
-    //     });
+    // card_list.forEach(card => {
+    //     const name = card.dataset.dog_name.toLowerCase();
+    //     // If the name of the card matchs the user's seach text, if it does don't modify it, if it doesn't make it disappear
+    //     card.style.display = name.includes(lower_case_search) ? '' : 'none'; 
     // });
 
-    for (let i = 0; i < list_of_dogs_id.length; ++i) {
-        const card = document.getElementById(list_of_dogs_id[i]);
-        const card_title = list_of_dogs_title[i];
-        // If it is search text is not a substring of the tile of the card, then hide the card
-        if (!card_title.includes(search_text)) {
-            card.style.display = 'none';
-        }
+    for (let i = 0; i < card_list.length; ++i) {
+        card = card_list.childNodes
     }
-
-    console.log("STOPPER 4");
 }
 
-async function search_dogs() {
+async function search_dogs(list_of_dog_types) {
     let search_text = await get_search_box_text();
 
-    filter_cards(search_text);
+    filter_cards(search_text, list_of_dog_types);
 }
 
 

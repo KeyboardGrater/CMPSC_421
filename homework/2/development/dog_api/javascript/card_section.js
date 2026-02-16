@@ -1,5 +1,6 @@
 let list_of_dogs_id = [];
 let list_of_dogs_title = []
+let counter = 0;
 
 async function generate_cards (list_of_breeds) {
     const card_template = document.getElementById("card-template");
@@ -7,6 +8,7 @@ async function generate_cards (list_of_breeds) {
     const max_cards_in_row = 12;
     let card_number = 0;
     let row;
+    const dog_list = [];
 
     // Check to see if we managed to get the card without any errors
     if (!card_template) {
@@ -28,74 +30,142 @@ async function generate_cards (list_of_breeds) {
         if (breed_object.sub_breed !== null) {
             const sub_breed_array = breed_object.sub_breed;
             sub_breed_array.forEach(async sub_breed => {
-                row = await create_card(breed_object.breed, sub_breed, card_template, card_section, card_number, max_cards_in_row, row);
+                row = await create_card(breed_object.breed, sub_breed, card_template, card_section, card_number, max_cards_in_row, row, dog_list);
                 card_number++;
             });
+            // for (let sub_breed of sub_breed_array) {
+            //     row = await create_card(breed_object.breed, sub_breed, card_template, card_section, card_number, max_cards_in_row, row);
+            //     card_number++;
+            // }
         }
         else {
-            row = await create_card(breed_object.breed, "" , card_template, card_section, card_number, max_cards_in_row, row);
+            row = await create_card(breed_object.breed, "" , card_template, card_section, card_number, max_cards_in_row, row, dog_list);
             card_number++;
         }
     }
-    
+    console.log("CONSOLE LOG AT THE BOTTOM OF GENERATE CARDS");
+
+    // Fails to get the picture of the last dog
+
+    return dog_list;
 }
 
-async function create_card (breed, sub_breed, card_template, card_section, card_number, max_cards_in_row, row) {
-    let image_link;
-    // Create the card based off the car template
-    const card = document.importNode(card_template.content, true);
 
-    // Modify the card so that it is eaiser to identify
-    const card_element = card.querySelector('.card');
-
-    card_element.id = `card-${breed}`;
-    if (sub_breed !== "") {
-        card_element.id += `-${sub_breed}`;
+function create_row (card_section, card_number, max_cards_in_row, row) {
+    if (card_number !== 0) {
+        card_section.appendChild(row);
     }
 
-    // Change the title of the card
-    const title_element = card_element.querySelector('.card-title');
-    title_element.textContent = `${breed} ${sub_breed ? `(${sub_breed})` : ''}`;
+    const new_row = document.createElement('div');
+    new_row.classList.add("row");
+    new_row.id = `row-${card_number / max_cards_in_row}`;
 
-    // Get the image. Be nice, and limit the api speed
+    return new_row;
+}
 
-    // setTimeout( async () => {
-    //     image = await get_image(breed, sub_breed);   
-    // }, 1_000);
+async function create_card (breed, sub_breed, card_template, card_section, card_number, max_cards_in_row, row, dog_list) {
+    let image_link;
+    let title = "";
+    // Create the card based off the card template
+    const clone = card_template.content.cloneNode(true);
+    const card = clone.querySelector(".card");
+
+    
+    // Add a title to it.
+    title = sub_breed !== "" ? `${breed} ${sub_breed}` : `${breed}`;
+    card.querySelector(".card-title").textContent = title;
+    
+    // Modify the 'dog-name' value
+    card.dataset.dog_name = title;
+
+    // Get the image
     image_link = await get_image(breed, sub_breed);
 
     // Modify the image
-    const image_element = card.querySelector("#card-image-id");
-    image_element.src = image_link;
-    image_element.style.width = '40%';
-    image_element.style.height ='40%';
+    const image = card.querySelector(".card-image-id");
+    image.src = image_link;
+    image.style.width = '40%';
+    image.style.height = '40%';
 
-
-    // Checks if we need to create a new row
+    // Check to see if we need to create a new row
     if (card_number % max_cards_in_row === 0) {
-        // Append the old row to the parent
-        if (card_number !== 0) {
-            card_section.appendChild(row);
-        }
-
-        row = document.createElement('div');
-
-        // Modify the rows properties
-        row.classList.add("row");
-        row.id = `row-${card_number / max_cards_in_row}`;
+        row = create_row(card_section, card_number, max_cards_in_row, row);
     }
-    
-    // Add card id to list of dogs
-    // list_of_dogs.push(title_element.textContent);
-    list_of_dogs_id.push(card_element.id);
-    list_of_dogs_title.push(title_element.textContent);
 
     // Append the card to the current row
     row.appendChild(card);
-    console.log("The number of times this message appears is the number of cards that were created");
 
+    // Add the title to the dog list
+    dog_list.push(title);
+    
+    console.log("The number of times this message appears is the number of cards that were created");
+    
+    // The dog_list, because it is an array, is passed by reference, thus it doesn't need to be returned
     return row;
 }
+
+
+
+
+
+
+// async function create_card (breed, sub_breed, card_template, card_section, card_number, max_cards_in_row, row) {
+//     let image_link;
+//     // Create the card based off the car template
+//     let template_info = card_template.content;
+//     const card = document.importNode(card_template.content, true);
+
+//     // Modify the card so that it is eaiser to identify
+//     const card_element = card.querySelector('.card');
+
+//     card_element.id = `card-${breed}`;
+//     if (sub_breed !== "") {
+//         card_element.id += `-${sub_breed}`;
+//     }
+
+//     // Change the title of the card
+//     const title_element = card_element.querySelector('.card-title');
+//     title_element.textContent = `${breed} ${sub_breed ? `(${sub_breed})` : ''}`;
+
+//     // Get the image. Be nice, and limit the api speed
+
+//     // setTimeout( async () => {
+//     //     image = await get_image(breed, sub_breed);   
+//     // }, 1_000);
+//     // image_link = await get_image(breed, sub_breed);
+
+//     // Modify the image
+//     // const image_element = card.querySelector("#card-image-id");
+//     // image_element.src = image_link;
+//     // image_element.style.width = '40%';
+//     // image_element.style.height ='40%';
+
+
+//     // Checks if we need to create a new row
+//     if (card_number % max_cards_in_row === 0) {
+//         // Append the old row to the parent
+//         if (card_number !== 0) {
+//             card_section.appendChild(row);
+//         }
+
+//         row = document.createElement('div');
+
+//         // Modify the rows properties
+//         row.classList.add("row");
+//         row.id = `row-${card_number / max_cards_in_row}`;
+//     }
+    
+//     // Add card id to list of dogs
+//     // list_of_dogs.push(title_element.textContent);
+//     list_of_dogs_id.push(card_element.id);
+//     list_of_dogs_title.push(title_element.textContent);
+
+//     // Append the card to the current row
+//     row.appendChild(card);
+//     console.log("The number of times this message appears is the number of cards that were created");
+
+//     return row;
+// }
 
 // function create_card (breed, sub_breed, card_template, card_section) {
 //     // Create the card based off the card template
@@ -145,5 +215,5 @@ function create_rows (list_of_breeds) {
        }
     }
 
-     
+    console.log("Num of dogs:" + num_of_dog_types);
 }
