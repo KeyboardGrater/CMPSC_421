@@ -13,7 +13,8 @@ function get_search_box_text() {
 
 function filter_cards(search_text, list_of_dog_types) { 
     // Get all the cards
-    const card_list = document.querySelector(".card");
+    const card_list = document.querySelectorAll(".card");
+    
     const lower_case_search = search_text.toLowerCase();
 
     // card_list.forEach(card => {
@@ -23,8 +24,13 @@ function filter_cards(search_text, list_of_dog_types) {
     // });
 
     for (let i = 0; i < card_list.length; ++i) {
-        card = card_list.childNodes
+        const card = card_list[i];
+        const name = card.dataset.dog_name.toLowerCase();
+        if (!name.includes(lower_case_search)) {
+            card.style.display = 'none';
+        }
     }
+    
 }
 
 async function search_dogs(list_of_dog_types) {

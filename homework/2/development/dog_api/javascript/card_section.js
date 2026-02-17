@@ -29,10 +29,16 @@ async function generate_cards (list_of_breeds) {
         // If the sub breed exist
         if (breed_object.sub_breed !== null) {
             const sub_breed_array = breed_object.sub_breed;
-            sub_breed_array.forEach(async sub_breed => {
+            // sub_breed_array.forEach(async sub_breed => {
+            //     row = await create_card(breed_object.breed, sub_breed, card_template, card_section, card_number, max_cards_in_row, row, dog_list);
+            //     card_number++;
+            // });
+            for (let sub_breed of sub_breed_array) {
                 row = await create_card(breed_object.breed, sub_breed, card_template, card_section, card_number, max_cards_in_row, row, dog_list);
                 card_number++;
-            });
+            }
+        
+
             // for (let sub_breed of sub_breed_array) {
             //     row = await create_card(breed_object.breed, sub_breed, card_template, card_section, card_number, max_cards_in_row, row);
             //     card_number++;
@@ -44,6 +50,9 @@ async function generate_cards (list_of_breeds) {
         }
     }
     console.log("CONSOLE LOG AT THE BOTTOM OF GENERATE CARDS");
+
+    // Append the last row
+    card_section.append(row);
 
     // Fails to get the picture of the last dog
 
@@ -76,7 +85,7 @@ async function create_card (breed, sub_breed, card_template, card_section, card_
     card.querySelector(".card-title").textContent = title;
     
     // Modify the 'dog-name' value
-    card.dataset.dog_name = title;
+    card.dataset.dog_name = title.toLowerCase();
 
     // Get the image
     image_link = await get_image(breed, sub_breed);
@@ -206,9 +215,9 @@ function create_rows (list_of_breeds) {
        // Check to see if it has any subreeds
        if (list_of_breeds[i].sub_breed !== null ) {
             const sub_breed_array = list_of_breeds[i].sub_breed;
-            sub_breed_array.forEach(sub_breed => {          // Counting single size array's as one type of dog
-                num_of_dog_types++;
-            })
+            // sub_breed_array.forEach(sub_breed => {          // Counting single size array's as one type of dog
+            //     num_of_dog_types++;
+            // })
        }
        else {
         num_of_dog_types++;
