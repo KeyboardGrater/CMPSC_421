@@ -1,4 +1,3 @@
-const api_key = Object.freeze("");
 
 async function get_information(country_code, zip_code) {
 
@@ -14,7 +13,7 @@ async function get_information(country_code, zip_code) {
         }
 
         // Otherwise, parse the json data
-        data = await Object.freeze(json_data.json());
+        data = await json_data.json();
 
         // Return the data
         const lat = Object.freeze(data.lat);
@@ -30,7 +29,7 @@ async function get_information(country_code, zip_code) {
 
 // Don't use because it use's pro. Hence the pro in the url
 async function get_hourly_weather (latitude, longitude, mearsurement_system) {
-    const url = `https://pro.openweathermap.org/data/2.5/forecast/hourly?lat=${latitude}&lon=${longitude}&appid=${api_key}&mode=${mearsurement_system}`;
+    // const url = `https://api.openweathermap.org/data/2.5/forecast/daily?lat=${latitude}&lon=${longitude}&cnt={cnt}&appid={API key}&mode=${mearsurement_system}`;
 
     try {
         const json_data = await fetch(url);
@@ -50,9 +49,12 @@ async function get_hourly_weather (latitude, longitude, mearsurement_system) {
     }
 }
 
-async function get_daily_weather (latitude, longitude, mearsurement_system) {
-    const url = `https://api.openweathermap.org/data/2.5/forecast/daily?lat=${latitude}&lon=${longitude}&cnt={cnt}&appid=${api_key}&mode=${mearsurement_system}`;
-    // https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={API key}
+async function get_daily_weather (latitude, longitude, num_days, mearsurement_system) {
+    // const url = `http://api.openweathermap.org/data/2.5/forecast/daily?lat=${latitude}&lon=${longitude}&cnt=${num_days}&appid=${api_key}&mode=${json}&unit=${mearsurement_system}`;
+    // const url = `api.openweathermap.org/data/2.5/forecast/daily?lat=${latitude}&lon=${longitude}&cnt=${num_days}&appid=${api_key}`
+    // const url = `https://pro.openweathermap.org/data/2.5/forecast/climate?lat=${latitude}&lon=${longitude}&appid=${api_key}`;
+    
+    
     try {
         const json_data = await fetch(url);
 

@@ -43,6 +43,8 @@ async function start_app () {
     let lat_long_info = {lat: 100, lon: 100};           // If it displays 100 for either then it is a error
     const mearsurement_system = "imperial";
     let weather_info;
+    const number_of_days = 7;
+    
     
     // Action Section
     zip_code = await get_zip_code();                        // Do I need the await hear, if I have the await right were I need it, down the chain
@@ -55,7 +57,8 @@ async function start_app () {
     lat_long_info = await get_information(country_code, zip_code);    // Do I need an await here?
 
     // Get the weather based of the latitude and the longitude
-    weather_info = get_daily_weather(lat_long_info.lat, lat_long_info.lon, mearsurement_system);
+    weather_info = get_daily_weather(lat_long_info.lat, lat_long_info.lon, number_of_days, mearsurement_system);
+
 
 
 }
