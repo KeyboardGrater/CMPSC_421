@@ -61,7 +61,7 @@ async function start_app () {
     let zip_code = -1;
     let country_code = "US";                            // Default to the us county code
     let lat_long_info = {lat: 100, lon: 100};           // If it displays 100 for either then it is a error
-    const mearsurement_system = "imperial";
+    const measurement_system = "imperial";
     let weather_info;
     const number_of_days = 7;
     let stripped_down_data;
@@ -77,7 +77,7 @@ async function start_app () {
     lat_long_info = await get_information(country_code, zip_code);    // Do I need an await here?
 
     // Get the weather based of the latitude and the longitude
-    weather_info = await get_daily_weather(lat_long_info.lat, lat_long_info.lon, number_of_days, mearsurement_system);
+    weather_info = await get_daily_weather(lat_long_info.lat, lat_long_info.lon, number_of_days, measurement_system);
 
     // Handel the weather data
     stripped_down_data = handel_data(weather_info);
@@ -93,4 +93,4 @@ function main () {
 main();
 
 // Maybe add something that disables the enter, or submission button for zip code after you click, or hit enter
-// Do I want the system and langague to be based of the country. And should I give the user, the choice of which system and location the want
+// Do I want the system and language to be based of the country. And should I give the user, the choice of which system and location the want
