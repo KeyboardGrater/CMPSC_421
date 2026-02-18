@@ -1,5 +1,24 @@
-const api_key = Object.freeze("");
 
+function handel_data(weather_info) {
+    // Extract the list from the weather info
+    const seven_days_info_extra = weather_info.list
+    const seven_days_info = seven_days_info_extra
+    let week_info = [];
+    
+    // Shrink the data down to only what is needed
+    seven_days_info.forEach(day => {
+        
+        week_info.push({
+            max_temp: day.temp.max,
+            min_temp: day.temp.min,
+            weather: day.weather[0].main
+        });
+    });
+
+    console.log("STOPPER");
+
+    return week_info;
+}
 
 // Returns the numerical representation of the text in the text box
 function read_zip_code_text (text_box) {
@@ -39,12 +58,33 @@ async function get_zip_code () {
 }
 
 async function start_app () {
-    let zip_code = -1
-    // Creation Section
-
+    let zip_code = -1;
+    let country_code = "US";                            // Default to the us county code
+    let lat_long_info = {lat: 100, lon: 100};           // If it displays 100 for either then it is a error
+    const measurement_system = "imperial";
+    let weather_info;
+    const number_of_days = 7;
+    let stripped_down_data;
+    
     // Action Section
     zip_code = await get_zip_code();                        // Do I need the await hear, if I have the await right were I need it, down the chain
     console.log(`Zip Code: ` + zip_code);
+
+    // After the zip code is obtained, launch the dynamic creation of the api call
+    // create_api_file();
+
+    // Get the latitude and the longitude based of the country and zip code
+    lat_long_info = await get_information(country_code, zip_code);    // Do I need an await here?
+
+    // Get the weather based of the latitude and the longitude
+    weather_info = await get_daily_weather(lat_long_info.lat, lat_long_info.lon, number_of_days, measurement_system);
+
+    // Handel the weather data
+    stripped_down_data = handel_data(weather_info);
+
+    // Create the ui
+    create_ui(stripped_down_data);
+
 }
 
 function main () {
@@ -53,3 +93,4 @@ function main () {
 main();
 
 // Maybe add something that disables the enter, or submission button for zip code after you click, or hit enter
+// Do I want the system and language to be based of the country. And should I give the user, the choice of which system and location the want
