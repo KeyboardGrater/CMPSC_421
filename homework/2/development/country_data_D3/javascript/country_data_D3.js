@@ -4,7 +4,8 @@ async function start_program() {
     
     // Get the api of the country
     country_info = await get_all_countries();
-
+    
+    create_map();
 
 }
 
