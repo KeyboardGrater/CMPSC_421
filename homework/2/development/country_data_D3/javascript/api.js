@@ -1,5 +1,5 @@
 async function get_all_countries () {
-    const url = `https://restcountries.com/v3.1/all?fields=name,capital,currencies,flags`;
+    const url = `https://restcountries.com/v3.1/all?fields=name,capital,currencies,flags,cca2,cca3`;
     let json_data;
     let data;
 
@@ -18,6 +18,7 @@ async function get_all_countries () {
         // Handle the data
         console.log("get all countries console log");
         
+        return data;
     }
     catch (error) {
         console.error("Error in the get_all_country section", error);

@@ -1,11 +1,11 @@
 
 async function start_program() {
-    let country_info;
+    let world_wide_info;
     
     // Get the api of the country
-    country_info = await get_all_countries();
+    world_wide_info = await get_all_countries();
     
-    create_map();
+    create_map(world_wide_info);
 
 }
 
