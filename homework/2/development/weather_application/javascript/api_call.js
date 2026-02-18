@@ -53,8 +53,11 @@ async function get_daily_weather (latitude, longitude, num_days, mearsurement_sy
     // const url = `http://api.openweathermap.org/data/2.5/forecast/daily?lat=${latitude}&lon=${longitude}&cnt=${num_days}&appid=${api_key}&unit=${mearsurement_system}`;
     // const url = `api.openweathermap.org/data/2.5/forecast/daily?lat=${latitude}&lon=${longitude}&cnt=${num_days}&appid=${api_key}`
     // const url = `https://pro.openweathermap.org/data/2.5/forecast/climate?lat=${latitude}&lon=${longitude}&appid=${api_key}`;
-    const url = `https://api.openweathermap.org/data/2.5/forecast/daily?lat=${latitude}&lon=${longitude}&cnt=7&units=imperial&appid=${api_key}`
-    
+    const url = `https://api.openweathermap.org/data/2.5/forecast/daily?lat=${latitude}&lon=${longitude}&cnt=${num_days}&units=${mearsurement_system}&appid=${api_key}`
+    let data;
+
+    console.log(url);
+
     try {
         const json_data = await fetch(url);
 
@@ -62,9 +65,11 @@ async function get_daily_weather (latitude, longitude, num_days, mearsurement_sy
             throw new Error (`Error fetching the bi-weekly weather`, json_data.statusText);
         }   
         
-        data = Object.freeze(json_data.json());
+        // data = Object.freeze(json_data.json());
+        data = await json_data.json();
 
         console.log("TEST");
+        return data;
     }
     catch (error) {
         console.error(`An error has occurened when connecting to the url: `, error);

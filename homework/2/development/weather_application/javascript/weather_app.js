@@ -1,4 +1,24 @@
 
+function handel_data(weather_info) {
+    // Extract the list from the weather info
+    const seven_days_info_extra = weather_info.list
+    const seven_days_info = seven_days_info_extra
+    let week_info = [];
+    
+    // Shrink the data down to only what is needed
+    seven_days_info.forEach(day => {
+        
+        week_info.push({
+            max_temp: day.temp.max,
+            min_temp: day.temp.min,
+            weather: day.weather[0].main
+        });
+    });
+
+    console.log("STOPPER");
+
+    return week_info;
+}
 
 // Returns the numerical representation of the text in the text box
 function read_zip_code_text (text_box) {
@@ -44,7 +64,7 @@ async function start_app () {
     const mearsurement_system = "imperial";
     let weather_info;
     const number_of_days = 7;
-    
+    let stripped_down_data;
     
     // Action Section
     zip_code = await get_zip_code();                        // Do I need the await hear, if I have the await right were I need it, down the chain
@@ -57,9 +77,13 @@ async function start_app () {
     lat_long_info = await get_information(country_code, zip_code);    // Do I need an await here?
 
     // Get the weather based of the latitude and the longitude
-    weather_info = get_daily_weather(lat_long_info.lat, lat_long_info.lon, number_of_days, mearsurement_system);
+    weather_info = await get_daily_weather(lat_long_info.lat, lat_long_info.lon, number_of_days, mearsurement_system);
 
+    // Handel the weather data
+    stripped_down_data = handel_data(weather_info);
 
+    // Create the ui
+    create_ui(stripped_down_data);
 
 }
 
