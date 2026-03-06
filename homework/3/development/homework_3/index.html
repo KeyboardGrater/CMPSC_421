@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+
+        <title>Typing Speed Test</title>
+
+        <!-- External Files-->
+        <link rel="stylesheet" href="src/css/typing_speed_test.css">
+
+        <script type="module" src="src/typescript/main.ts"></script>
+    </head>
+
+    <body>
+        <div id="title-timer-section" class="horizontally-stackable">
+            <!-- Title -->
+            <div id="title-section" >
+                <h1>Typing Speed Test</h1>
+            </div>
+        </div>
+        
+        <!-- Vue Section -->
+        <div id="app">
+            <!-- Timer Section -->
+            <div id="timer-section" class="horizontally-centered">
+                <div id="timer">{{time_remaining}}</div>
+            </div>
+
+            <!-- Non-mostly-static section-->
+            <div id="game-section" class="horizontally-centered some-padding">
+                <!-- Create a section for the button to start the game -->
+                <button @click="start_game">Start Game</button>
+            </div>
+        </div>
+
+    </body>
+
+</html>
