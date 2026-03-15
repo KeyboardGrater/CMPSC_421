@@ -23,7 +23,9 @@ export function start_countdown(context: any) {
             // Make sure the clock is zero
             context.time_remaining = 0;
             
-            console.log("Exiting the countdown section");
+            // Update the state of the game
+            context.game_state = "after-round";
         }
     }, time_interval);
+    
 }

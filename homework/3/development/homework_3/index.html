@@ -20,16 +20,102 @@
         </div>
         
         <!-- Vue Section -->
-        <div id="app">
+        <div id="app" v-cloak>
             <!-- Timer Section -->
             <div id="timer-section" class="horizontally-centered">
                 <div id="timer">{{time_remaining}}</div>
             </div>
 
             <!-- Non-mostly-static section-->
-            <div id="game-section" class="horizontally-centered some-padding">
-                <!-- Create a section for the button to start the game -->
-                <button @click="start_game">Start Game</button>
+            <div id="game-section" class="">
+                <!-- Beginning (before the start) of the game --> 
+                <div v-if="game_state === 'before-round'">
+                    <button id="start-button" @click="start_game">            
+                        Start Game                                                  <!-- The button will disappear when the game runs-->
+                    </button>
+                    <input v-model="name">
+                </div>
+
+                <!-- During the game -->
+                <div v-if="game_state === 'during-round'">
+                    <!-- Text to type section-->
+                    <div id="text-to-type-section">
+                        <p id="text-to-type-paragraph">
+                            <span
+                                v-for="(character, index) in paragraph"
+                                    :key="index"
+                                    :class="modify_characters(index)"
+                            >{{ character }}</span>
+                        </p>
+                    </div>
+                    <!-- User input text box-->
+                    <input id="input-box" v-model="user_text">
+                </div>
+                
+                <!-- After round-->
+                <div id="end-game-section" v-if="game_state === 'after-round'">
+                    <div id="personal-score">
+                        <!-- Character Section --> 
+                        <div id="personal-character-section" class="scoring-divider">
+                            <div id="correct-characters-section" class="correct">
+                                <h3>
+                                    Correct characters: {{correct_characters}}
+                                </h3>
+                            </div>
+                            <div id="total-characters-section" class="total">
+                                <h3>
+                                    Total characters: {{correct_characters + wrong_characters}}
+                                </h3>
+                            </div>
+                            <div id="wrong-characters-section" class="wrong">
+                                <h3>
+                                    Wrong characters: {{wrong_characters}}
+                                </h3>
+                            </div>
+                        </div>
+                        <div id="personal-word-section" class="scoring-divider">
+                            <div id="correct-word-section" class="correct">
+                                <h3>
+                                    Correct words: {{correct_words}}
+                                </h3>
+                            </div>
+                            <div id="total-word-section" class="total">
+                                <h3>
+                                    Total words: {{correct_words + wrong_words}}
+                                </h3>
+                            </div>
+                            <div id="wrong-words-section" class="wrong">
+                                <h3>
+                                    Wrong words: {{wrong_words}}
+                                </h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="leaderboard">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Correct Characters</th>
+                                    <th>Incorrect Characters</th>
+                                    <th>Correct Words</th>
+                                    <th>Incorrect Words</th>
+                                    <th>Accuracy</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="(entry, index) in leaderboard_data" :key="index">
+                                    <td>{{ entry.name }}</td>
+                                    <td>{{ entry.correct_characters }}</td>
+                                    <td>{{ entry.wrong_characters }}</td>
+                                    <td>{{ entry.correct_words }}</td>
+                                    <td>{{ entry.wrong_words }}</td>
+                                    <td>{{ entry.accuracy }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
 

@@ -1,3 +1,8 @@
+/* Hide Vue template until mounted */
+[v-cloak] {
+	display: none;
+}
+
 /* Classes */
 	/* Alignment */
 		.horizontally-centered {
@@ -18,6 +23,34 @@
 			padding: 200px;
 		}
 	
+	/* Character status */
+		/* .char-not-reached-yet {
+			color: black
+		} */
+		.char-is-correct {
+			color: green
+		}
+		.char-is-incorrect {
+			color: red
+		}
+	
+	/* Scoring */
+		.scoring-divider {
+			display: flex;
+			gap: 20px;
+			align-items: center;
+		}	
+
+		.correct {
+			background-color: green;
+		}
+		.total {
+			background-color: grey;
+		}
+		.wrong {
+			background-color: red;
+		}
+		
 
 /* Individual */
 	#timer {
@@ -39,3 +72,16 @@
 		display: flex;
 		/* font-family: 'Times New Roman', Times, serif; */
 	}
+
+	#text-to-type-section {
+		/* Dimensions */
+		width: 80%;
+		height: 400px;
+	}
+
+	#input-box {
+		/* Dimensions */
+		width: 80%;
+		height: 24px;
+	}
+
