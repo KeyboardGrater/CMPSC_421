@@ -1,13 +1,14 @@
 import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 
 import type { APP_STATE } from './interfaces_and_constants';
 import { APP_BASE_HREF } from '@angular/common';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, FormsModule],
+  imports: [RouterOutlet, FormsModule, CommonModule],
   templateUrl: '../html/app.html',
   styleUrls: ['../css/app.css']
 })
@@ -18,16 +19,26 @@ export class App {
   public task: string;
   public taskObtained: boolean;
   
-  private appState: APP_STATE;
   private timeRemaining = signal(10);
   private timerId: ReturnType<typeof setInterval> | undefined;
   private taskList: string [];
+  private _appState = signal<APP_STATE>("before-run");
+
   constructor() {
-    // State
-    this.appState = "before-run";
+    console.log(`Within the constructor`);
     this.task = "";
     this.taskList = [];
     this.taskObtained = false;
+  }
+
+  // App State and supporting
+  get appState (): APP_STATE {
+    return this._appState();
+  }
+  set appState (state: APP_STATE) {
+    console.log(`State before change: ${this.appState}`);
+    this._appState.set(state);
+    console.log(`State after change: ${this.appState}`);
   }
 
   modifyTimer() {
@@ -72,7 +83,6 @@ export class App {
       if (this.timeRemaining() <= 0) {
         // Change the state of the app to after-running
         this.appState = "after-running";
-        console.log(this.appState);
         // Cancel the interval timer
         clearInterval(this.timerId);
       }
@@ -128,7 +138,8 @@ export class App {
   }
 
   onStartButtonClick() {
-    
+    // Get rid of the before-start html, by advancing the app state to the "running" state. Which inturn displays the next form of html.
+    this.modifyTimer();
   }
 
 }

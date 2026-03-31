@@ -16,17 +16,34 @@
 <div id="root">
   <!-- Landing Page -->
     <!-- Task Assignment Section-->
-      <div class="horizontalCenter">
-        <form #myForm="ngForm">
-            <div class="stackable">
-              <input #taskInput type="text" (keyup.enter)="onTaskInput(taskInput.value)" placeholder="Enter Task Here" required>
-              <button (click)="onStartButtonClick()" [disabled]="!taskObtained">Start Timer</button>
-            </div>
-        </form>
+      <div [ngSwitch]="appState" class="horizontalCenter">
+        
+        <!-- Before the Run-->
+        <div *ngSwitchCase="'before-run'">
+          <form #myForm="ngForm">
+              <div class="stackable">
+                <input #taskInput type="text" (keyup.enter)="onTaskInput(taskInput.value)" placeholder="Enter Task Here" required>
+                <button (click)="onStartButtonClick()" [disabled]="!taskObtained">Start Timer</button>
+              </div>
+          </form>
+        </div>
+
+        <!-- When Running -->
+        <div *ngSwitchCase="'running'" class="stackable">
+          <!-- Timer -->
+          <h1>{{ displayTime }}</h1>        
+        </div>
+        
+        <!-- When Paused -->
+        <div *ngSwitchCase="'paused'" class="stackable">
+            
+        </div>
+
+        <!-- After Running -->
+        <div *ngSwitchCase="'after-running'" class="stackable">
+          
+        </div>
+        
       </div>
-    
-
-    
-
 </div>
 
