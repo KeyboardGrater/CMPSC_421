@@ -6,6 +6,9 @@ import { CommonModule } from '@angular/common';
 import type { APP_STATE } from './interfaces_and_constants';
 import { APP_BASE_HREF } from '@angular/common';
 
+// Timer time in seconds
+const timerTime: number = 10;
+
 @Component({
   selector: 'app-root',
   imports: [RouterOutlet, FormsModule, CommonModule],
@@ -22,9 +25,9 @@ export class App {
   public nameOfTrack = signal<string>("");
   public audioFileNames: string [];
   public audio: HTMLAudioElement | null;
-  public taskList: string [];
+  public taskList = signal<string[]>([]);
+  public timeRemaining = signal(timerTime);
   
-  private timeRemaining = signal(10);
   private timerId: ReturnType<typeof setInterval> | undefined;
   private _appState = signal<APP_STATE>("before-run");
 
@@ -32,9 +35,9 @@ export class App {
   constructor() {
     console.log(`Within the constructor`);
     this.task = "";
-    this.taskList = [];
+    this.taskList.set([]);
     this.taskObtained = false;
-    this.audioFileNames = ["bbc_cafe_1", "bbc_cafe_2", "bbc_cafe_3", "bbc_rain_1", "bbc_rain_2", "bbc_rain_3", "bbc_rain_4"]; 
+    this.audioFileNames = ["bbc_cafe_1", "bbc_cafe_2", "bbc_cafe_3", "bbc_rain_1", "bbc_rain_2", "bbc_rain_3", "bbc_rain_4","fassounds-lofi", "monume-lofi", "the_mountain-lofi"]; 
     // this.nameOfTrack = "";
     this.audio = null;
   }
@@ -232,5 +235,15 @@ function endOfTimer(appInfo: App): void {
   appInfo.audio.currentTime = 0;
 
   // Add the current task to the list
-  appInfo.taskList.push(appInfo.task);
+  appInfo.taskList.update(list => [...list, appInfo.task]);
+
+  // Update the timer so that it is back to normal time
+  appInfo.timeRemaining.set(timerTime);
+
+  // Make the taskObtained flag false, so that it can get new text
+  appInfo.taskObtained = false;
+
+  // Set the state back to the begining
+  appInfo.appState = "before-run";
+  
 }

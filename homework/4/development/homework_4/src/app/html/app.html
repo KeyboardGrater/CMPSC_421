@@ -11,6 +11,13 @@
                 <button (click)="onStartButtonClick()" [disabled]="!taskObtained">Start Timer</button>
               </div>
           </form>
+          <div id="taskList" class="stackable">
+            <h1>Task List: </h1>
+            <ul>
+              <li *ngFor="let task of taskList()">{{ task }}</li>
+            </ul>
+          </div>
+          
         </div>
 
         <!-- When Running -->
@@ -21,16 +28,6 @@
           <!-- <audio #musicPlayer id="music-player"></audio>   -->
           <br>
           <h3>Playing: {{ nameOfTrack() }}</h3>
-        </div>
-        
-        <!-- When Paused -->
-        <div *ngSwitchCase="'paused'" class="stackable">
-            
-        </div>
-
-        <!-- After Running -->
-        <div *ngSwitchCase="'after-running'" class="stackable">
-          
         </div>
         
       </div>
