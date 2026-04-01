@@ -183,6 +183,15 @@ export class App {
     
   }
 
+  switchToTaskList() {
+    // Change to the taskView state
+    this.appState = "taskView";
+  }
+
+  switchToRoot() {
+    // Change back to the main menu view
+    this.appState = "before-run";
+  }
 
 }
 

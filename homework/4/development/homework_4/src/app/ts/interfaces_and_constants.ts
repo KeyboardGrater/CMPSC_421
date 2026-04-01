@@ -1,6 +1,6 @@
 
 // Keeps track of the current state of the game. This makes the current state of the game one of four options
-export type APP_STATE = "before-run" | "running" | "paused" | "after-running" 
+export type APP_STATE = "before-run" | "running" | "paused" | "after-running" | "taskView"; 
 
 // Interfaces 
 

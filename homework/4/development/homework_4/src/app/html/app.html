@@ -9,14 +9,9 @@
               <div class="stackable">
                 <input #taskInput type="text" (keyup.enter)="onTaskInput(taskInput.value)" placeholder="Enter Task Here" required>
                 <button (click)="onStartButtonClick()" [disabled]="!taskObtained">Start Timer</button>
+                <button (click)="switchToTaskList()">Switch to Task List</button>
               </div>
           </form>
-          <div id="taskList" class="stackable">
-            <h1>Task List: </h1>
-            <ul>
-              <li *ngFor="let task of taskList()">{{ task }}</li>
-            </ul>
-          </div>
           
         </div>
 
@@ -30,6 +25,16 @@
           <h3>Playing: {{ nameOfTrack() }}</h3>
         </div>
         
+        <!-- View Screen -->
+        <div *ngSwitchCase="'taskView'" class="stackable">
+          <div id="taskList">
+            <h1>Task List: </h1>
+            <ul>
+              <li *ngFor="let task of taskList()">{{ task }}</li>
+            </ul>
+            <button (click)="switchToRoot()">Switch to Main Menu</button>
+          </div>
+        </div>
       </div>
 </div>
 
