@@ -20,12 +20,14 @@ export class App {
   public taskObtained: boolean;
   // public nameOfTrack: string;
   public nameOfTrack = signal<string>("");
+  public audioFileNames: string [];
+  public audio: HTMLAudioElement | null;
+  public taskList: string [];
   
   private timeRemaining = signal(10);
   private timerId: ReturnType<typeof setInterval> | undefined;
-  private taskList: string [];
   private _appState = signal<APP_STATE>("before-run");
-  private audioFileNames: string [];
+
   
   constructor() {
     console.log(`Within the constructor`);
@@ -34,6 +36,7 @@ export class App {
     this.taskObtained = false;
     this.audioFileNames = ["bbc_cafe_1", "bbc_cafe_2", "bbc_cafe_3", "bbc_rain_1", "bbc_rain_2", "bbc_rain_3", "bbc_rain_4"]; 
     // this.nameOfTrack = "";
+    this.audio = null;
   }
 
   // App State and supporting
@@ -73,11 +76,6 @@ export class App {
         // Update the state of the app
         this.appState = "running";
         break;
-      default:        // After running
-        // When the timer ends up reaching zero (if this.appState === "after-running")
-        console.log("Reached the timer is up point");
-        // Store the task in the list
-        this.taskList.push(this.task);
     }
   }
 
@@ -94,6 +92,8 @@ export class App {
         this.appState = "after-running";
         // Cancel the interval timer
         clearInterval(this.timerId);
+        
+        endOfTimer(this);
       }
       else {
       // Otherwise, keep decrementing the clock
@@ -153,44 +153,14 @@ export class App {
   
 
   playMusic() {
+    // Disable the current sound track if one is currently playing
+    if (this.audio) {
+      this.audio.pause();
+      this.audio.currentTime = 0;
+    }
 
-    // console.log(`State: ${this.appState}`)
-
-    // const audio = document.getElementById("music-player") as HTMLAudioElement | null;
-    // let trackName: string;
-    // let audioFilePath: string;
-
-    // // Check to see if audio is null, if so return
-    // if (!audio) {
-    //   return;
-    // }
-    
-    // console.log(`Within playMusic`);
-
-    // audio.addEventListener("event", () => {
-    //   // First check to see if the timer has ended
-    //   if (this.appState === "after-running") {    // TODO: FIX THIS LATER
-    //     return;
-    //   }
-
-    //   // If not, then randomly pick a track from the list
-    //   trackName = randomItemInArray(this.audioFileNames);
-
-    //   // Complete the file path of the audio track
-    //   audioFilePath = "../mp3/" + trackName + ".mp3";
-
-    //   console.log(`trackName: ${trackName}`);
-
-    //   // Update the name of the audio track that is currently playing
-    //   this.nameOfTrack.set(trackName);
-
-    //   // Start the audio file
-    //   audio.play();
-
-    // });
-    
     // Randomly get a name from the audio track array
-    let trackName: string = randomItemInArray(this.audioFileNames);
+    const trackName: string = randomItemInArray(this.audioFileNames);
 
     // Make the name of track the trackName
     this.nameOfTrack.set(trackName);
@@ -198,24 +168,69 @@ export class App {
     // Add the file path to the track name
     const filepath: string = "/" + trackName + ".mp3";
 
-    console.log(`Filepath: ${filepath}`);
 
     // Get the audio track, based off the file path
-    const audio = new Audio(filepath);
+    this.audio = new Audio(filepath);
 
-    audio.play();
+    // Have it play a track until the timer is up
+    this.audio.addEventListener('ended', () => trackEnded(this));
+    
+    // play the sound track
+    this.audio.play();
     
   }
 
 
 }
 
-// Randomly pick the index, then pick a element based off the index, and return it.
-function randomItemInArray (array: string []) {
-  return array[randomIndexOfArray(array.length)];
-}
 
 // Randomly pick a index between the values of 0 and last index (length - 1)
 function randomIndexOfArray(arrayLength: number): number {
   return Math.floor(Math.random() * arrayLength);
+}
+// Randomly pick the index, then pick a element based off the index, and return it.
+function randomItemInArray (array: string []) {
+  return array[randomIndexOfArray(array.length)];
+}
+// Get information for the next track
+function trackEnded(appInfo: App) {
+  // Destroy the old track
+  if (appInfo.audio) {
+    appInfo.audio.pause();
+    appInfo.audio.currentTime = 0;
+  }
+
+  let filePath: string;
+  // Randomly get the name of the track from the track name array
+  const trackName: string = randomItemInArray(appInfo.audioFileNames);
+
+  // Update the nameOfTrack to be the trackName
+  appInfo.nameOfTrack.set(trackName);
+  
+  // Add the stuff to the track name in order to get the file path
+  filePath = "/" + trackName + ".mp3";
+
+  // Get the audio track, based off the file path
+  appInfo.audio = new Audio(filePath)
+  
+  // Keep playing until the timer stops everything
+  appInfo.audio.addEventListener('ended', () => trackEnded(appInfo));
+
+  // Play the file
+  appInfo.audio.play();
+}
+
+function endOfTimer(appInfo: App): void {
+  // Return eariler if the audio does not exist
+  if (!appInfo.audio) {
+    return;
+  }
+
+  // Pause the audio
+  appInfo.audio.pause();
+  // Set the audio to time zero
+  appInfo.audio.currentTime = 0;
+
+  // Add the current task to the list
+  appInfo.taskList.push(appInfo.task);
 }
