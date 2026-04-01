@@ -1,18 +1,3 @@
-<!-- <div id="root">
-
-   Timer
-  <h1>{{ displayTime }}</h1>
-   Button to start the timer
-  <button
-    (click)="modifyTimer()">
-  </button>
-
-  <input [(ngModel)]="task" type="text">
-
-  
-  
-</div> -->
-
 <div id="root">
   <!-- Landing Page -->
     <!-- Task Assignment Section-->
@@ -31,7 +16,11 @@
         <!-- When Running -->
         <div *ngSwitchCase="'running'" class="stackable">
           <!-- Timer -->
-          <h1>{{ displayTime }}</h1>        
+          <h1>{{ displayTime }}</h1>
+          <br>
+          <!-- <audio #musicPlayer id="music-player"></audio>   -->
+          <br>
+          <h3>Playing: {{ nameOfTrack() }}</h3>
         </div>
         
         <!-- When Paused -->

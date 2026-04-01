@@ -18,17 +18,22 @@ export class App {
   // Defined
   public task: string;
   public taskObtained: boolean;
+  // public nameOfTrack: string;
+  public nameOfTrack = signal<string>("");
   
   private timeRemaining = signal(10);
   private timerId: ReturnType<typeof setInterval> | undefined;
   private taskList: string [];
   private _appState = signal<APP_STATE>("before-run");
-
+  private audioFileNames: string [];
+  
   constructor() {
     console.log(`Within the constructor`);
     this.task = "";
     this.taskList = [];
     this.taskObtained = false;
+    this.audioFileNames = ["bbc_cafe_1", "bbc_cafe_2", "bbc_cafe_3", "bbc_rain_1", "bbc_rain_2", "bbc_rain_3", "bbc_rain_4"]; 
+    // this.nameOfTrack = "";
   }
 
   // App State and supporting
@@ -49,6 +54,10 @@ export class App {
         this.startTimer();
         // Update the state of the app to running
         this.appState = "running";
+
+        // Starts playing the music
+        this.playMusic();
+
         break;
       case "running":
         // When the user presses the button when the program is running (counting down)
@@ -140,6 +149,73 @@ export class App {
   onStartButtonClick() {
     // Get rid of the before-start html, by advancing the app state to the "running" state. Which inturn displays the next form of html.
     this.modifyTimer();
+  } 
+  
+
+  playMusic() {
+
+    // console.log(`State: ${this.appState}`)
+
+    // const audio = document.getElementById("music-player") as HTMLAudioElement | null;
+    // let trackName: string;
+    // let audioFilePath: string;
+
+    // // Check to see if audio is null, if so return
+    // if (!audio) {
+    //   return;
+    // }
+    
+    // console.log(`Within playMusic`);
+
+    // audio.addEventListener("event", () => {
+    //   // First check to see if the timer has ended
+    //   if (this.appState === "after-running") {    // TODO: FIX THIS LATER
+    //     return;
+    //   }
+
+    //   // If not, then randomly pick a track from the list
+    //   trackName = randomItemInArray(this.audioFileNames);
+
+    //   // Complete the file path of the audio track
+    //   audioFilePath = "../mp3/" + trackName + ".mp3";
+
+    //   console.log(`trackName: ${trackName}`);
+
+    //   // Update the name of the audio track that is currently playing
+    //   this.nameOfTrack.set(trackName);
+
+    //   // Start the audio file
+    //   audio.play();
+
+    // });
+    
+    // Randomly get a name from the audio track array
+    let trackName: string = randomItemInArray(this.audioFileNames);
+
+    // Make the name of track the trackName
+    this.nameOfTrack.set(trackName);
+
+    // Add the file path to the track name
+    const filepath: string = "/" + trackName + ".mp3";
+
+    console.log(`Filepath: ${filepath}`);
+
+    // Get the audio track, based off the file path
+    const audio = new Audio(filepath);
+
+    audio.play();
+    
   }
 
+
+}
+
+// Randomly pick the index, then pick a element based off the index, and return it.
+function randomItemInArray (array: string []) {
+  return array[randomIndexOfArray(array.length)];
+}
+
+// Randomly pick a index between the values of 0 and last index (length - 1)
+function randomIndexOfArray(arrayLength: number): number {
+  return Math.floor(Math.random() * arrayLength);
 }
