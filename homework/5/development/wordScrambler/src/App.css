@@ -1,0 +1,11 @@
+/* Classes */
+.horizontally-centered {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.container {
+  display: flex;
+  flex-direction: column;   /* Vertical Stacking */
+  gap: 5px;
+}
