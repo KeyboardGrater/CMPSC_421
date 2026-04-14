@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
-import { useDroppable } from '@dnd-kit/core';
 import React, {Children, useEffect, useState} from "react";
-import { DndContext, useDraggable } from '@dnd-kit/core';
+import { DndContext, useDraggable, useDroppable } from '@dnd-kit/core';
+import { CSS} from '@dnd-kit/utilities';
 
 import type { ChoosenWordInfo, TargetSlotProps, DraggableProps } from '../interfaces';
 import { wordScrambelingFunction } from '../logic/logic'
@@ -77,11 +77,17 @@ function PlaceableSquares({id, children, letter}: DraggableProps) {
         id: id,
     });
 
+    // Shows the dragging
+    const style = {
+        transform: CSS.Translate.toString(transform),
+    }
+
     const className: string = `Dragging-block ${isDragging ? "dragging" : "notDragging"}`;
 
     return (
         <div
             ref={setNodeRef}
+            style={style}
             className={className}
             {...listeners}
             {...attributes}
