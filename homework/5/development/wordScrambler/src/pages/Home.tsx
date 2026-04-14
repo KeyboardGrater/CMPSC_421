@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import React, {Children, useEffect, useState} from "react";
+import React, {Children, useEffect, useState, type JSX} from "react";
 import { DndContext, useDraggable, useDroppable, type DragEndEvent } from '@dnd-kit/core';
 import { CSS} from '@dnd-kit/utilities';
 
@@ -12,6 +12,7 @@ export const Home = () => {
     // const [gameData, setGameData] = useState(Promise<ChoosenWordInfo | null>);
     const [gameData, setGameData] = useState<ChoosenWordInfo | null>(null);
     const [slots, setSlots] = useState<Record<number, string | null>>({});
+    const [isCompleted, setIsCompleted] = useState(false);
 
     useEffect( () => {
         // Get the word, it's original word (string), charArray, and scrambled array
@@ -24,7 +25,23 @@ export const Home = () => {
             ...prev,
             [targetSlotId as number]: letter
         }));
-    }
+    };
+
+    // Check for completion
+    useEffect(() => {
+        if (!gameData) return;
+        const allFilled = gameData.unscrambled.every((letter, idx) => slots[idx] === letter);
+        const allSlotsFilled = Object.keys(slots).length === gameData.unscrambled.length && Object.values(slots).every(l => l);
+        setIsCompleted(allFilled && allSlotsFilled);
+    }, [slots, gameData]);
+
+    const handlePlayAgain = () => {
+        setSlots({});
+        setIsCompleted(false);
+        wordScrambelingFunction().then((data) => {
+            setGameData(data);
+        });
+    };
 
     // Check to see if the wordScrambelingFunction returns null. If so, the board will not be made.
     if (!gameData) {
@@ -36,7 +53,13 @@ export const Home = () => {
             <div className="horizontally-centered container">
                 <h1>Word Scrambler</h1>
                 <h3>It's like Scrabble, but because of trademarks, it is legally distinct.</h3>
+                <h3>And for added difficulty, you can't remove a letter unless you have another letter to take it's place.</h3>
                 {/* <button onClick={wordScrambelingFunction}>Testing Button</button> */}
+                {isCompleted && (
+                    <button onClick={handlePlayAgain} style={{ marginTop: '1rem', fontSize: '1.2rem' }}>
+                        Play Again
+                    </button>
+                )}
             </div>
 
             {/*
@@ -91,14 +114,31 @@ export const Home = () => {
                 
                 {/* Dragging boxes */}
                 <div>
-                    {gameData.scrambled.map((item, index) => {
-                        const isPlaced = Object.values(slots).includes(item);
-                        return !isPlaced ? (
-                            <PlaceableSquares key={index} id={index} letter={item}>
-                                {""}
-                            </PlaceableSquares>
-                        ) : null;
-                    })}
+                    {/* Fix for duplicate letters: count how many of each letter are placed, only hide as many as have been placed */}
+                    {(() => {
+                        // Count how many of each letter are placed
+                        const placedCount: Record<string, number> = {};
+                        Object.values(slots).forEach((letter) => {
+                            if (letter) placedCount[letter] = (placedCount[letter] || 0) + 1;
+                        });
+                        // For each scrambled letter, only hide as many as have been placed
+                        const rendered: JSX.Element[] = [];
+                        const usedCount: Record<string, number> = {};
+                        gameData.scrambled.forEach((item, index) => {
+                            usedCount[item] = (usedCount[item] || 0) + 1;
+                            const placed = placedCount[item] || 0;
+                            if (usedCount[item] <= placed) {
+                                // This instance is already placed
+                                return;
+                            }
+                            rendered.push(
+                                <PlaceableSquares key={index} id={index} letter={item}>
+                                    {""}
+                                </PlaceableSquares>
+                            );
+                        });
+                        return rendered;
+                    })()}
                 </div>
             
             </DndContext>          
