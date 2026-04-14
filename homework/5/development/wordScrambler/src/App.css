@@ -9,3 +9,58 @@
   flex-direction: column;   /* Vertical Stacking */
   gap: 5px;
 }
+
+.hover-button {
+  background-color: coral;
+}
+.hover-button:hover {
+  background-color: silver;
+}
+
+.slot {
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  border: 2px solid #333;
+  margin: 4px;
+  text-align: center;
+  vertical-align: middle;
+  font-size: 2rem;
+  background: #fff;
+}
+
+.hover-button.hovered {
+  background: #e0e0e0;
+  border-color: #007bff;
+}
+
+.Dragging-block {
+  cursor: grab;
+  /* transition: ; */
+
+  display: inline-block;
+  border: 2px solid black;
+  border-radius: 8px;
+  width: 60px;
+  height: 60px;
+  padding: 8px;
+  margin: 6px;
+  line-height: 60px;
+  text-align: center;
+  font-size: 2.2rem;
+  background: #f8f8f8;
+  box-shadow: 1px 2px 6px rgba(0,0,0,0.08);
+}
+.Dragging-block.dragging {
+  opacity: 0.5;
+  cursor: grabbing;
+  z-index: 999;
+}
+
+.tight-box {
+  display: inline-block;
+  border: 1px solid black;
+  padding: 2px;
+  line-height: 1;
+  text-align: center;
+}
