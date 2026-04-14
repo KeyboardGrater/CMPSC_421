@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import React, {Children, useEffect, useState} from "react";
-import { DndContext, useDraggable, useDroppable } from '@dnd-kit/core';
+import { DndContext, useDraggable, useDroppable, type DragEndEvent } from '@dnd-kit/core';
 import { CSS} from '@dnd-kit/utilities';
 
 import type { ChoosenWordInfo, TargetSlotProps, DraggableProps } from '../interfaces';
@@ -11,6 +11,7 @@ export const Home = () => {
     // const [gameData, setGameData] = useState(wordScrambelingFunction());
     // const [gameData, setGameData] = useState(Promise<ChoosenWordInfo | null>);
     const [gameData, setGameData] = useState<ChoosenWordInfo | null>(null);
+    const [slots, setSlots] = useState<Record<string, string | null>>({});
 
     useEffect( () => {
         // Get the word, it's original word (string), charArray, and scrambled array
@@ -18,6 +19,12 @@ export const Home = () => {
            setGameData(data); 
         })
     }, []);
+    const onMove = (letter: string, targetSlotId: string | null) => {
+        setSlots(prev => ({
+            ...prev,
+            [targetSlotId as string]: letter
+        }));
+    }
 
     // Check to see if the wordScrambelingFunction returns null. If so, the board will not be made.
     if (!gameData) {
@@ -32,27 +39,71 @@ export const Home = () => {
                 <button onClick={wordScrambelingFunction}>Testing Button</button>
             </div>
 
+            {/*
             <DndContext>
-                {/* Target Boxes */}
+                {/* Target Boxes
                 <div>
                     {gameData.unscrambled.map((_, index) =>(
                         <TargetSlot key={index} id={index}>
-                            {/* TODO */}
+                            {/* TODO
                             {""}
                         </TargetSlot>
                     ))}
                 </div>
                 
-                {/* Dragging boxes*/}
+                {/* Dragging boxes 
                 <div>
                     {gameData.scrambled.map((item, index) => 
                         <PlaceableSquares key={index} id={index} letter={item}>
-                            {/* TODO */}
+                            {/* TODO
                             {""}
                         </PlaceableSquares>
                     )}
                 </div>
-            </DndContext>            
+
+
+            </DndContext>  
+            */}
+
+            <DndContext onDragEnd={(event) => {
+                const letter = event.active.data.current?.letter;
+                handleDragEnd(event, (targetId) => {
+                    if (targetId) setSlots (prev => ({...prev, [targetId]: letter}));
+                })
+            }}>
+                {/* Target Boxes */}    
+                 <div>
+                    {gameData.unscrambled.map((_, index) =>(
+                        <TargetSlot key={index} id={index}>
+                            {/* Check if a letter has been dropped here */}
+                            {slots[`slot-${index}`] ? (
+                                <div className="placed-letter">{slots[`slot-${index}`]}</div>
+                            ) : null}
+                        </TargetSlot>
+                    ))}
+                </div>
+                
+                {/* Dragging boxes */}
+                <div>
+                    {/* {gameData.scrambled.map((item, index) => {}
+
+                        const isPlaced = Object.values(slots).includes(item);
+                        return !isPlaced ? (
+                            <PlaceableSquares key={index} id={`letter-${index}`} letter={item} />
+                        : null;)
+                    )} */}
+                    {gameData.scrambled.map((item, index) => {
+
+                        const isPlaced = Object.values(slots).includes(item);
+                        return !isPlaced ? (
+                            <PlaceableSquares key={index} id={index} letter={item}>
+                                {""}
+                            </PlaceableSquares>
+                        ) : null;
+                    })}
+                </div>
+            
+            </DndContext>          
         </div>
     );
 }
@@ -96,6 +147,20 @@ function PlaceableSquares({id, children, letter}: DraggableProps) {
         </div>
     );
 }
+
+const handleDragEnd = (event: DragEndEvent, onMove: (targetId: string | null) => void) => {
+    const {over} = event;
+
+    if (over) {
+        // This occures when the block is dropped
+        console.log("Placed in: ", over.id);
+        onMove(over.id.toString());
+    }
+    else {
+        console.log("Dropped in the void");
+        onMove(null);
+    }
+}; 
 
 // function PlaceableSquares({id, children}: Props) {
 //     const {attributes, listeners, setNodeRef, transform, isDragging} = useDraggable({
