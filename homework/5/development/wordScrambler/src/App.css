@@ -29,6 +29,12 @@
   background: #fff;
 }
 
+.correct-slot {
+  background: #b6fcb6 !important;
+  border-color: #2ecc40 !important;
+}
+
+
 .hover-button.hovered {
   background: #e0e0e0;
   border-color: #007bff;

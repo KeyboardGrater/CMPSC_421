@@ -37,7 +37,7 @@ export async function wordScrambelingFunction (): Promise<ChoosenWordInfo | null
         return null;
     }
 
-    console.log(randomlyChoose(wordBank));
-
-    return randomlyChoose(wordBank);
+    const wordInfo: ChoosenWordInfo = randomlyChoose(wordBank);
+    console.log(wordInfo);
+    return wordInfo;
 }

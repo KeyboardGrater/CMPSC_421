@@ -11,7 +11,7 @@ export const Home = () => {
     // const [gameData, setGameData] = useState(wordScrambelingFunction());
     // const [gameData, setGameData] = useState(Promise<ChoosenWordInfo | null>);
     const [gameData, setGameData] = useState<ChoosenWordInfo | null>(null);
-    const [slots, setSlots] = useState<Record<string, string | null>>({});
+    const [slots, setSlots] = useState<Record<number, string | null>>({});
 
     useEffect( () => {
         // Get the word, it's original word (string), charArray, and scrambled array
@@ -19,10 +19,10 @@ export const Home = () => {
            setGameData(data); 
         })
     }, []);
-    const onMove = (letter: string, targetSlotId: string | null) => {
+    const onMove = (letter: string, targetSlotId: number | null) => {
         setSlots(prev => ({
             ...prev,
-            [targetSlotId as string]: letter
+            [targetSlotId as number]: letter
         }));
     }
 
@@ -36,7 +36,7 @@ export const Home = () => {
             <div className="horizontally-centered container">
                 <h1>Word Scrambler</h1>
                 <h3>It's like Scrabble, but because of trademarks, it is legally distinct.</h3>
-                <button onClick={wordScrambelingFunction}>Testing Button</button>
+                {/* <button onClick={wordScrambelingFunction}>Testing Button</button> */}
             </div>
 
             {/*
@@ -68,32 +68,30 @@ export const Home = () => {
             <DndContext onDragEnd={(event) => {
                 const letter = event.active.data.current?.letter;
                 handleDragEnd(event, (targetId) => {
-                    if (targetId) setSlots (prev => ({...prev, [targetId]: letter}));
+                    if (typeof targetId === 'number') setSlots(prev => ({ ...prev, [targetId]: letter }));
                 })
             }}>
                 {/* Target Boxes */}    
                  <div>
-                    {gameData.unscrambled.map((_, index) =>(
-                        <TargetSlot key={index} id={index}>
-                            {/* Check if a letter has been dropped here */}
-                            {slots[`slot-${index}`] ? (
-                                <div className="placed-letter">{slots[`slot-${index}`]}</div>
-                            ) : null}
-                        </TargetSlot>
-                    ))}
+                    {gameData.unscrambled.map((correctLetter, index) => {
+                        const droppedLetter = slots[index];
+                        const isCorrect = droppedLetter === correctLetter;
+                        console.log(`DroppedLetter: ${droppedLetter}`);
+                        console.log(`isCorrect: ${isCorrect}`);
+                        return (
+                            <TargetSlot key={index} id={index} isCorrect={isCorrect}>
+                                {/* Check if a letter has been dropped here */}
+                                {droppedLetter ? (
+                                    <div className="placed-letter">{droppedLetter}</div>
+                                ) : null}
+                            </TargetSlot>
+                        );
+                    })}
                 </div>
                 
                 {/* Dragging boxes */}
                 <div>
-                    {/* {gameData.scrambled.map((item, index) => {}
-
-                        const isPlaced = Object.values(slots).includes(item);
-                        return !isPlaced ? (
-                            <PlaceableSquares key={index} id={`letter-${index}`} letter={item} />
-                        : null;)
-                    )} */}
                     {gameData.scrambled.map((item, index) => {
-
                         const isPlaced = Object.values(slots).includes(item);
                         return !isPlaced ? (
                             <PlaceableSquares key={index} id={index} letter={item}>
@@ -108,12 +106,14 @@ export const Home = () => {
     );
 }
 
-function TargetSlot({ id, children }: TargetSlotProps) {
+function TargetSlot({ id, children, isCorrect }: TargetSlotProps & { isCorrect?: boolean }) {
     const { isOver, setNodeRef } = useDroppable({
         id: id,
     });
 
-    const className: string = `slot hover-button${isOver ? " hovered" : ""}`;
+    let className: string = `slot hover-button`;
+    if (isOver) className += " hovered";
+    if (isCorrect) className += " correct-slot";
 
     return (
         <div ref={setNodeRef} className={className}>
@@ -126,6 +126,7 @@ function TargetSlot({ id, children }: TargetSlotProps) {
 function PlaceableSquares({id, children, letter}: DraggableProps) {
     const {attributes, listeners, setNodeRef, transform, isDragging} = useDraggable({
         id: id,
+        data: { letter }
     });
 
     // Shows the dragging
@@ -148,19 +149,19 @@ function PlaceableSquares({id, children, letter}: DraggableProps) {
     );
 }
 
-const handleDragEnd = (event: DragEndEvent, onMove: (targetId: string | null) => void) => {
+const handleDragEnd = (event: DragEndEvent, onMove: (targetId: number | null) => void) => {
     const {over} = event;
 
     if (over) {
-        // This occures when the block is dropped
-        console.log("Placed in: ", over.id);
-        onMove(over.id.toString());
-    }
-    else {
+        // This occurs when the block is dropped
+        const id = typeof over.id === 'string' ? parseInt(over.id, 10) : over.id;
+        console.log("Placed in: ", id);
+        onMove(id);
+    } else {
         console.log("Dropped in the void");
         onMove(null);
     }
-}; 
+};
 
 // function PlaceableSquares({id, children}: Props) {
 //     const {attributes, listeners, setNodeRef, transform, isDragging} = useDraggable({
